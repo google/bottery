@@ -1,0 +1,79 @@
+.chat-holder {
+
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	width: 100%;
+	background-color: hsla(290, 50%, 50%, 1);
+}
+
+.chat-bubbles {
+	overflow: scroll;
+	flex: 1;
+	background-color: hsla(320, 50%, 100%, 1);
+}
+
+.chat-bubblerow {
+	position: relative;
+	margin:5px;
+	background-color: hsla(120, 50%, 80%, .0);
+}
+.chat-bubble {
+	font-size: 14px;
+	display: inline-block;
+	text-align: left;
+	max-width: 85%;
+	padding: 10px 14px;
+	border-radius: 18px;
+	background-color: hsla(20, 10%, 97%, 1);
+	color : hsla(0, 0%, 100%, .94);
+	font-weight: lighter;
+}
+
+.chat-chip {
+	font-size: 14px;
+	display: inline-block;
+	text-align: left;
+	max-width: 85%;
+	padding: 10px 14px;
+	border-radius: 18px;
+	background-color: hsla(220, 10%, 40%, 1);
+	color : hsla(0, 0%, 100%, .94);
+	font-weight: lighter;
+}
+
+.chat-chip:hover {
+	background-color: hsla(190, 40%, 40%, 1);
+
+}
+.chat-chip:active {
+	background-color: hsla(190, 60%, 70%, 1);
+
+}
+
+.chat-owner0.chat-bubblerow {
+	text-align: right;
+}
+
+
+.chat-owner0 .chat-bubble  {
+	border-bottom-right-radius:0px;
+	background-color: hsla(270, 40%, 43%, 1);
+}
+
+
+.chat-owner1 .chat-bubble  {
+	background-color: hsla(190, 65%, 45%, 1);
+	border-bottom-left-radius:0px;
+}
+
+.chat-inputfield {
+	padding: 5px;
+	
+}
+.chat-inputrow {
+	
+
+	padding: 5px;
+	background-color: hsla(240, 50%, 80%, 1);
+}
