@@ -1,18 +1,3 @@
-// Copyright 2017 Google Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-
 var app = {
 	start: Date.now(),
 	autoprogress: false,
@@ -40,45 +25,55 @@ var app = {
 		app.time.current = temp;
 	},
 
-	selectEntity: function(entity) {
-		//inspector.inspect(entity);
-	},
 
 
+	loadMapByID: function(id, edited) {
+		console.log("Load map by id: " + id + " edited: " + edited);
 
-	loadMapByID: function(id, allowStorage) {
-		var found;
-		if (allowStorage) {
-			found = localStorage.getItem(id);
-			console.log("Searched local storage " + id);
+
+		var raw = testMaps[id];
+
+		if (edited) {
+
+			var found = localStorage.getItem("map_" + id);
+
+			if (found !== null) {
+				raw = JSON.parse(found);
+				console.log("successfully loaded edited" + id);
+			}
 		}
 
-		var last = localStorage.setItem("lastMap", id);
+		if (!raw) {
+			console.log(inQuotes(id) + " not found");
+			id = "lostTesla";
+			raw = testMaps[id];
+		}
+
 		$("#map-select").val(id);
 
-		if (found) {
-			app.loadMap(JSON.parse(found), id);
-		} else {
-			if (!testMaps[id]) 
-				id = "amIPsychic";
+		if (raw) {
 
-				app.loadMap(testMaps[id], id);
-			
-			
+			app.loadMap(raw, id);
+			localStorage.setItem("lastMap", id);
+		} else {
+			console.log("Map" + inQuotes(id) + " not found");
+			app.loadMap(testMaps[id], id);
 		}
 
 	},
 
 	loadMap: function(raw, id) {
-		console.log("ID: " + id);
+
+
 
 		if (!raw.settings)
 			raw.settings = {
-				name: id
+				id: id
 			};
 
-		$("#map-name").html(id + "_edited");
-console.log(raw);
+
+		$("#map-name").text(id);
+
 		var loaded = mapCount++;
 
 		// clear current
@@ -87,6 +82,7 @@ console.log(raw);
 
 		app.rawMap = raw;
 		app.map = parseMap(raw);
+		app.map.name = id;
 
 		editMap(app.rawMap, $("#edit-json"));
 
@@ -101,9 +97,9 @@ console.log(raw);
 
 		//console.log(app.pointer);
 
-
+		viz.createMapViz(app.map);
 		/*
-				viz.createMapViz(app.map);
+			
 
 			
 				app.pointer.updateView();
@@ -117,7 +113,12 @@ var mapCount = 0;
 var updateSpeed = 20;
 
 $(document).ready(function() {
-
+	new Panel("viz", {
+		x: 0,
+		y: 520,
+		w: 320,
+		h: 128,
+	});
 
 
 	new Panel("controls", {
@@ -165,19 +166,21 @@ $(document).ready(function() {
 	io.init();
 	chat.init();
 	viz.init();
-	inspector.init();
+
 	controls.init();
 
 
 	function update() {
-		console.log("update");
 		if (!app.paused && !app.ioLocked) {
 			app.pointer.update();
 		}
 		setTimeout(update, Math.pow(1 - app.updateSpeed, 2) * 450 + 100);
 	}
 
-	app.loadMapByID(app.mapName, true);
+
+	var last = localStorage.getItem("lastMap");
+
+	app.loadMapByID(last, true);
 	update();
 
 

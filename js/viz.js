@@ -1,18 +1,3 @@
-// Copyright 2017 Google Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-
 var viz = {
 	init: function() {
 		var holder = $("#panel-viz .panel-content");
@@ -20,66 +5,65 @@ var viz = {
 			id: "viz"
 		}).appendTo(holder);
 
-		this.minipanel = $("<div/>", {
-			id: "viz-mini"
-		}).appendTo(holder);
+		/*
+				this.minipanel = $("<div/>", {
+					id: "viz-mini"
+				}).appendTo(holder);
+		*/
 
 	},
 
-	highlight: function(entity, exclusive) {
-		var id = '#' + entity.type + "-" + entity.key;
 
-
-		if (exclusive)
-			this.cytoscape.$("." + entity.type).removeClass("highlighted");
-
-		this.cytoscape.$(id).addClass("highlighted");
+	setClassesIf: function(entity, classes, cond) {
+		if (entity && this.cytoscape) {
+			var id = '#' + entity.type + "-" + entity.key;
+			if (cond)
+				this.cytoscape.$(id).addClass(classes);
+			else
+				this.cytoscape.$(id).removeClass(classes);
+		}
 	},
 
-	activateInGraph: function(entity) {
+	setClassesExclusive: function(entity, classes) {
+		if (entity && this.cytoscape) {
+			this.cytoscape.$("." + entity.type).removeClass(classes);
+			var id = '#' + entity.type + "-" + entity.key;
+			this.cytoscape.$(id).addClass(classes);
+		}
+	},
 
-		var id = '#' + entity.type + "-" + entity.key;
-		console.log("activate " + id);
-		this.cytoscape.$(id).addClass("active");
+	removeExitClasses: function() {
+		if (this.cytoscape) {
+			this.cytoscape.$(".exit").removeClass("open");
+			this.cytoscape.$(".exit").removeClass("active");
+		}
+	},
+
+
+	createExitData: function(exit, originalID) {
+
+		var targetKey = exit.target.raw;
+		var target = "state-" + targetKey;
+
+		// self
+		if (targetKey === "self") {
+			target = originalID;
+		}
+
+		return {
+			data: {
+				target: target,
+				id: "exit-" + exit.key,
+				label: exit.label,
+
+			},
+			classes: "exit"
+		}
 	},
 
 	mapToCytoData: function(map) {
 
-		function createExitData(exit, originalID) {
-
-			var target = "state-" + exit.target;
-
-			// self
-			if (exit.target === "self") {
-				target = originalID;
-			}
-
-		
-
-			if (exit.target === "@" || exit.target === "*") {
-				var popID = "pop-" + exit.id;
-				target = popID;
-
-				cytoData.push({
-					data: {
-						id: popID,
-						label: "*",
-					},
-					classes: "pop dot"
-				});
-
-			}
-
-			return {
-				data: {
-					target: target,
-					id: "exit-" + exit.key,
-					label: exit.label,
-
-				},
-				classes: "exit"
-			}
-		}
+		console.log(map);
 
 		var cytoData = [];
 		$.each(map.states, function(key, state) {
@@ -87,67 +71,26 @@ var viz = {
 			cytoData.push({
 				data: {
 					id: stateID,
-					label: state.label,
+					label: state.key,
 				},
 				classes: "state"
 			});
 
+
 			$.each(state.exits, function(key, exit) {
 
-				var exitData = createExitData(exit, stateID);
+				var exitData = viz.createExitData(exit, stateID);
 				exitData.data.source = stateID;
 				cytoData.push(exitData);
 			});
 
-			// An imaginaryexit from the state to a set of exits
-			$.each(state.exitSets, function(key, setName) {
-
-				var exitToSet = {
-					data: {
-						target: "exitSet-" + setName,
-						source: stateID,
-					},
-					classes: "semiexit exit"
-				}
-
-				cytoData.push(exitToSet);
-
-			});
-
-
 		});
-
-
-
-		$.each(map.exitSets, function(key, exitSet) {
-			var setID = "exitSet-" + key;
-			cytoData.push({
-				data: {
-					id: setID,
-					label: key
-
-				},
-				classes: "exitSet"
-			});
-
-			for (var i = 0; i < exitSet.length; i++) {
-				var exit = map.exits[exitSet[i]];
-
-				var exitData = createExitData(exit);
-				exitData.data.source = setID;
-				console.log(exitData);
-				cytoData.push(exitData);
-			}
-
-		})
 
 		return cytoData;
 
 	},
 
 	createMapViz: function(map) {
-
-
 
 		this.cytoscape = cytoscape({
 			container: this.vizHolder,
@@ -170,6 +113,12 @@ var viz = {
 
 				}
 			}, {
+				selector: 'node.active',
+				style: {
+					'background-color': 'blue',
+
+				}
+			}, {
 				selector: 'node.dot',
 				style: {
 					'color': 'rgb(255, 255, 255)',
@@ -179,75 +128,32 @@ var viz = {
 					'label': 'data(label)',
 
 					'shape': "ellipse",
-					
-					'width': 20,
-					'height': 20
-				}
-			}, {
-				selector: 'node.exitSet',
-				style: {
-					'shape': "ellipse",
-					'label': 'data(label)',
-					'width': 20,
-					'height': 20
 
+					'width': 20,
+					'height': 20
 				}
-			}, {
-				selector: 'node.pop',
-				style: {}
 			}, {
 				selector: '.exit',
 				style: {
-					'target-arrow-color': 'grey',
+
+					'curve-style':'bezier',
 					'line-color': 'grey',
 					'color': 'grey',
 					'label': 'data(label)',
+
+					'target-arrow-color': '#000',
 					'target-arrow-shape': 'triangle',
+
 					'font-size': '14',
 					'width': '2',
 				}
 			}, {
-				selector: 'edge.highlighted',
-				style: {
-
-					'line-color': 'hsl(190, 30%, 60%)',
-					'color': 'hsl(190, 30%, 60%)',
-					'target-arrow-color': 'hsl(190, 30%, 60%)',
-					'width': '6',
-				}
-			}, {
-				selector: '.semiexit.exit',
-				style: {
-
-					'target-arrow-color': 'grey',
-					'line-color': 'grey',
-					'color': 'grey',
-					'target-arrow-shape': 'triangle',
-					'line-style': 'dashed',
-					'width': '1',
-				}
-			}, {
-				selector: '.exit.active',
-				style: {
-					'target-arrow-color': 'hsla(190, 30%, 60%, 1)',
-					'line-color': 'hsla(190, 30%, 60%, 1)',
-					'width': '6',
-
-				}
-			}, {
-				selector: 'edge.open.active',
+				selector: 'edge.open',
 				style: {
 					'target-arrow-color': 'hsla(190, 100%, 60%)',
 					'line-color': 'hsla(190, 100%, 60%)',
 					'width': '7',
 
-				}
-			}, {
-				selector: '.visited',
-				style: {
-					'background-color': 'rgb(0, 190, 255)',
-					'line-color': 'rgb(0, 190, 255)',
-					'target-arrow-color': 'rgb(0, 190, 255)',
 				}
 			}],
 

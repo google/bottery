@@ -1,19 +1,5 @@
-// Copyright 2017 Google Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-
 var mapSections = ["states", "initialBlackboard", "grammar"];
+
 
 
 function createEditorUI() {
@@ -110,6 +96,23 @@ function createEditorUI() {
 		save();
 	});
 
+	// All savednames are prefixed with map_
+	var savedNames = [];
+	for (var i = 0, len = localStorage.length; i < len; ++i) {
+		var key = localStorage.key(i);
+		if (key.startsWith("map_"))
+			savedNames.push(key.substring(4));
+	}
+
+	console.log("Saved found: " + savedNames);
+
+	controls.createDropdownControl("savedMap", savedNames, function(val) {
+		// load from storage
+		console.log("val:", val);
+		app.loadMapByID(val, true);
+		//	app.loadMap(JSON.parse(localStorage.getItem(val)), val.substring(4));
+	}, editBar)
+
 	var output = $("<textarea/>", {
 		id: "output"
 	}).appendTo(editBar);
@@ -120,19 +123,23 @@ function editMap(map) {
 	// show the states, grammar, and 
 	for (var i = 0; i < mapSections.length; i++) {
 		var s = JSON.stringify(map[mapSections[i]], null, 2);
+		$("#edit-content-" + mapSections[i]).html("");
 		$("#edit-content-" + mapSections[i]).html(s);
 	}
 }
 
 function save() {
 	app.map.name = $("#map-name").text();
+
+
 	console.log("SAVING ", app.map.name);
+
 
 	var toSave = JSON.stringify(rebuildMap(), "null", 2);
 
-	localStorage.setItem(app.map.name, toSave);
-	var found = localStorage.getItem(app.map.name);
-	console.log(found);
+	localStorage.setItem("map_" + app.map.name, toSave);
+	var found = localStorage.getItem("map_" + app.map.name);
+
 
 	app.loadMap(JSON.parse(found));
 
@@ -147,10 +154,10 @@ function rebuildMap() {
 		var s = $("#edit-content-" + key).text();
 		var obj = parseJSONSection(s);
 
-		if (obj) {
+		if (obj !== undefined) {
 			newMap[key] = obj;
 		} else {
-			console.log("current " + key + " broken, use previous version");
+			console.log("current " + key + " section broken, use previous version");
 			newMap[key] = app.rawMap[key];
 		}
 
@@ -161,11 +168,15 @@ function rebuildMap() {
 
 function parseJSONSection(json) {
 
+	if (json.trim().length === 0)
+		return {};
+
 	var parsed;
 
 	try {
 		parsed = JSON.parse(json)
 	} catch (ev) {
+		return undefined;
 		// ignore 
 	}
 

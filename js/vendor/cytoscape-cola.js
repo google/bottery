@@ -106,26 +106,16 @@ SOFTWARE.
       };
 
       var updateNodePositions = function(){
-        var x = { min: Infinity, max: -Infinity };
-        var y = { min: Infinity, max: -Infinity };
-
         for( var i = 0; i < nodes.length; i++ ){
           var node = nodes[i];
           var scratch = node.scratch('cola');
 
-          x.min = Math.min( x.min, scratch.x || 0 );
-          x.max = Math.max( x.max, scratch.x || 0 );
-
-          y.min = Math.min( y.min, scratch.y || 0 );
-          y.max = Math.max( y.max, scratch.y || 0 );
-
           // update node dims
           if( !scratch.updatedDims ){
-            var nbb = node.boundingBox();
             var padding = getOptVal( options.nodeSpacing, node );
 
-            scratch.width = nbb.w + 2*padding;
-            scratch.height = nbb.h + 2*padding;
+            scratch.width = node.outerWidth() + 2*padding;
+            scratch.height = node.outerHeight() + 2*padding;
           }
         }
 
@@ -135,8 +125,8 @@ SOFTWARE.
 
           if( !node.grabbed() && !node.isParent() ){
             retPos = {
-              x: bb.x1 + scratch.x - x.min,
-              y: bb.y1 + scratch.y - y.min
+              x: bb.x1 + scratch.x,
+              y: bb.y1 + scratch.y
             };
 
             if( !isNumber(retPos.x) || !isNumber(retPos.y) ){
@@ -163,6 +153,8 @@ SOFTWARE.
         if( options.ungrabifyWhileSimulating ){
           grabbableNodes.grabify();
         }
+
+        cy.off('destroy', destroyHandler);
 
         nodes.off('grab free position', grabHandler);
         nodes.off('lock unlock', lockHandler);
@@ -270,16 +262,20 @@ SOFTWARE.
         grabbableNodes.ungrabify();
       }
 
+      var destroyHandler;
+      cy.one('destroy', destroyHandler = function(e){
+        layout.stop();
+      });
+
       // handle node dragging
       var grabHandler;
       nodes.on('grab free position', grabHandler = function(e){
         var node = this;
         var scrCola = node.scratch().cola;
         var pos = node.position();
+        var nodeIsTarget = e.cyTarget === node || e.target === node;
 
-        // update cola pos obj
-        scrCola.x = pos.x - bb.x1;
-        scrCola.y = pos.y - bb.y1;
+        if( !nodeIsTarget ){ return; }
 
         switch( e.type ){
           case 'grab':
@@ -288,6 +284,14 @@ SOFTWARE.
             break;
           case 'free':
             adaptor.dragend( scrCola );
+            break;
+          case 'position':
+            // only update when different (i.e. manual .position() call or drag) so we don't loop needlessly
+            if( scrCola.px !== pos.x - bb.x1 || scrCola.py !== pos.y - bb.y1 ){
+              scrCola.px = pos.x - bb.x1;
+              scrCola.py = pos.y - bb.y1;
+              adaptor.resume();
+            }
             break;
         }
 
@@ -398,7 +402,9 @@ SOFTWARE.
 
           padding: Math.max( pleft, pright, ptop, pbottom ),
 
-          leaves: node.descendants().stdFilter(function( child ){
+          // leaves should only contain direct descendants (children),
+          // not the leaves of nested compound nodes or any nodes that are compounds themselves
+          leaves: node.children().stdFilter(function( child ){
             return !child.isParent();
           }).map(function( child ){
             return child[0].scratch().cola.index;
@@ -409,7 +415,7 @@ SOFTWARE.
 
         return node;
       }).map(function( node ){ // add subgroups
-        node.scratch().cola.groups = node.descendants().stdFilter(function( child ){
+        node.scratch().cola.groups = node.children().stdFilter(function( child ){
           return child.isParent();
         }).map(function( child ){
           return child.scratch().cola.index;

@@ -1,18 +1,3 @@
-// Copyright 2017 Google Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-
 function createMapDiagram(node, holder, settings) {
 
 	if (node === undefined || node === null) {
@@ -57,8 +42,11 @@ function createMapDiagram(node, holder, settings) {
 	}).appendTo(holder);
 
 	if (settings && settings.label) {
+		var labelClass =  "small-label";
+		if (settings.labelClass)
+			labelClass += " " + settings.labelClass;
 		var label = $("<div/>", {
-			class: "small-label",
+			class: labelClass,
 			text: settings.label
 
 		}).appendTo(div);
@@ -102,23 +90,31 @@ function createMapDiagram(node, holder, settings) {
 			}).appendTo(content);
 
 			$.each(node.states, function(key, state) {
+
 				createMapDiagram(state, stateHolder, {
-					label: key
+					label: key,
+					labelClass: "stateID"
 				});
-			})
-
-
-
-			createMapDiagram(node.exits, content, {
-				label: "exits"
 			});
+
+
 			break;
 
 		case "state":
 
-			createMapDiagram(node.onEnter, content, {
-				label: "onEnter"
-			});
+			if (node.onEnter.length > 0) {
+				createMapDiagram(node.onEnter, content, {
+					label: "onEnter",
+					classes: "map-onEnter",
+				});
+
+			}
+			if (node.exits.length > 0) {
+				createMapDiagram(node.exits, content, {
+					label: "exits",
+					classes: "map-exits",
+				});
+			}
 			break;
 
 		case "exit":
@@ -129,20 +125,28 @@ function createMapDiagram(node, holder, settings) {
 
 			if (node.conditions.length > 0) {
 				createMapDiagram(node.conditions, content, {
-					label: "conditions",
 					arrayClasses: "map-condition"
 				});
 			}
 			content.append("▶");
-			createDiagram(node.target, content, {
-				label: "target"
+			createMapDiagram(node.target, content, {
+			
+				classes: "target stateID"
 			});
 			if (node.actions.length > 0) {
 				createMapDiagram(node.actions, content, {
-					label: "actions",
 					arrayClasses: "map-action"
 				});
 			}
+			break;
+		case "label":
+			content.addClass("label-" + node.labelClass);
+			content.text(node.text);
+			break;
+
+
+	case "target":
+			content.text(node.raw);
 			break;
 
 		case "action":
@@ -154,10 +158,30 @@ function createMapDiagram(node, holder, settings) {
 			});
 
 			switch (node.actionType) {
-				case "expression":
-					createMapDiagram(node.expression, content, {
 
-					});
+				case "expression":
+
+					createMapDiagram(node.expression, content);
+					break;
+
+				case "forEach":
+					createMapDiagram(node.action, content);
+					createMapDiagram({
+						type: "label",
+						labelClass: "syntax",
+						text: "for"
+					}, content);
+					createMapDiagram({
+						type: "label",
+						labelClass: "key",
+						text: node.key
+					}, content);
+					createMapDiagram({
+						labelClass: "syntax",
+						type: "label",
+						text: "in"
+					}, content);
+					createMapDiagram(node.source, content);
 					break;
 
 				case "doOne":
@@ -211,7 +235,7 @@ function createMapDiagram(node, holder, settings) {
 					});
 
 					break;
-						case "expression":
+				case "expression":
 					createMapDiagram(node.expression, content);
 
 					break;
@@ -233,14 +257,19 @@ function createMapDiagram(node, holder, settings) {
 			break;
 
 		case "path":
+
+			var arrayClasses = "path-step";
+			if (node.isFunction)
+				arrayClasses += " fxn-name";
+
 			createMapDiagram(node.steps, content, {
-				arrayClasses: "path-step",
+				arrayClasses: arrayClasses
 			});
 			if (node.isFunction)
 				div.addClass("map-function");
 			if (node.parameters && node.parameters.length > 0) {
 				createMapDiagram(node.parameters, content, {
-					label: "parameters",
+					//	label: "parameters",
 					classes: "map-parameters"
 				});
 			}

@@ -1,28 +1,30 @@
-// Copyright 2017 Google Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-
 // Trivia game noodle
 
 
 // Create a stateMap
 var testMaps = {
+	testIf: {
+		states: {
+			origin: {
+				//onEnter: "val=random() if(val<.5,'low #/val#', 'high #/val#')"
+				onEnter: "_count=0 'foo'"
+					//onEnter: "val=random()" 
+			}
+		},
+
+		initialBlackboard: {
+			numbers: [1, 12, 43, 124],
+			foo: {
+				bar: 4
+			}
+		}
+	},
+
 
 	amIPsychic: {
 		states: {
 			origin: {
-				onEnterSay: "#/v#To most people, the future is dark and murky, but maybe you’re different. Maybe the future to you is an unread book, just waiting to be pulled off the shelf. Will you flip through its pages? Will you read into the future? Will you discover your psychic potential?",
+				onEnterSay: "#To most people, the future is dark and murky, but maybe you’re different. Maybe the future to you is an unread book, just waiting to be pulled off the shelf. Will you flip through its pages? Will you read into the future? Will you discover your psychic potential?",
 				exits: ["_totalPlays>0 ->returningPlayer", "->firstTimePlayer"],
 			},
 
@@ -76,7 +78,7 @@ var testMaps = {
 			// On achieving a new losing streak
 
 			right: {
-				onEnter: "'#youWereRight#' winStreak++ lastLoseStreak=loseStreak loseStreak=0 rightGuesses++ pattern+='C' accuracy=rightGuesses/(wrongGuesses + rightGuesses)",
+				onEnter: "'#youWereRight#' winStreak++ lastLoseStreak=loseStreak loseStreak=0 rightGuesses++ pattern+='C' accuracy=rightGuesses/(wrongGuesses + rightGuesses) winStreak>maxWinStreak if(winStreak>maxWinStreak, '#newWinBestScore#')",
 
 				onEnterDoOne: ["lastLoseStreak>2 '#lostLosingStreak#'",
 					"winStreak>streak2 '#winningStreak2#'",
@@ -89,7 +91,7 @@ var testMaps = {
 			},
 
 			wrong: {
-				onEnter: "'#youWereWrong#' loseStreak++ lastWinStreak=winStreak  winStreak=0 wrongGuesses++ pattern+='X' accuracy=rightGuesses/(wrongGuesses + rightGuesses)",
+				onEnter: "'#youWereWrong#' loseStreak++ lastWinStreak=winStreak  winStreak=0 wrongGuesses++ pattern+='X' accuracy=rightGuesses/(wrongGuesses + rightGuesses) if(winStreak>maxWinStreak, '#newWinBestScore#')",
 
 				onEnterDoOne: ["lastWinStreak>2 '#lostWinningStreak#'",
 					"loseStreak>streak2 '#losingStreak2#'",
@@ -108,6 +110,8 @@ var testMaps = {
 		initialBlackboard: {
 			wrongGuesses: 0,
 			rightGuesses: 0,
+			maxLoseStreak: 0,
+			maxWinStreak: 0,
 			pattern: "",
 			winStreak: 0,
 			loseStreak: 0,
@@ -120,6 +124,8 @@ var testMaps = {
 		grammar: {
 
 			// BAD WRITING FROM KATE
+			newWinBestScore: "You've got a new record of #/maxWinStreak# wins in a row",
+			newLoseBestScore: "You've got a new record of #/maxWinStreak# losses in a row",
 			winningStreak2: "That's amazing, you're so good!",
 			winningStreak1: "You've really got a winning streak going!",
 			winningStreak0: "Very promising",
@@ -378,19 +384,23 @@ var testMaps = {
 			},
 
 			q_start: {
-				exits: ["count<5 ->q_ask", "count>=5 ->calculateScore"],
+				exits: ["count<qCount ->q_ask", "->calculateScore"],
 			},
 
 			// Compare two things
 			q_ask: {
 				onEnter: "count++ q0=select(themes) q1=select(themes)",
 				onEnterSay: ["#question#"],
-				exits: ["'one' ->q_start scores[q0]++", "'two' ->q_start scores[q1]++"]
+				exits: ["'one' ->q_start '#/q0#++' scores[q0]++", "'two' ->q_start '#/q1#++' scores[q1]++"]
 			},
 
 			// Find the two highest scores
 			calculateScore: {
-				onEnterFxn: function(pointer) {
+
+				onEnterFxn: function() {
+					var pointer = this;
+
+					console.log("Calculate");
 					var sorted = ["Tough", "Nature", "Nerd", "Kawaii", "Money"].sort(function(a, b) {
 						var scoreA = pointer.get("scores." + a);
 						var scoreB = pointer.get("scores." + b);
@@ -398,13 +408,21 @@ var testMaps = {
 						return scoreB - scoreA;
 					});
 
-					if (pointer.get(sorted[1]) === 0) {
+					console.log("score." + sorted[0]);
+					console.log("score." + sorted[1]);
+
+
+					if (pointer.get("score." + sorted[1]) === 0) {
 						pointer.set("theme1", sorted[0]);
 					} else {
 						pointer.set("theme1", sorted[1]);
 					}
 
 					pointer.set("theme0", sorted[0]);
+
+					console.log(sorted[0], sorted[1]);
+
+
 				},
 				exits: "->assignName"
 			},
@@ -427,6 +445,7 @@ var testMaps = {
 		},
 
 		initialBlackboard: {
+			qCount: 3,
 			themes: ["Tough", "Nature", "Nerd", "Kawaii", "Money"],
 		},
 		grammar: {
@@ -481,12 +500,6 @@ var testMaps = {
 			origin: {
 				exits: ["->initRhyme"],
 			},
-			activity: {
-				nature: ["go for a hike", "watch fish in a pond", "climb a mountain"],
-				money: [""],
-				nerd: [],
-				kawaii: [],
-			},
 
 			initRhyme: {
 				onEnter: "rhyme=select(rhymes) firstLine=select(lines[rhyme]) '#/firstLine#'",
@@ -496,8 +509,6 @@ var testMaps = {
 			rhyme: {
 				onEnter: "firstLine=select(lines[rhyme]) '#/firstLine#' 'Is this a good next line?'",
 				exits: ["wait:40 ->rhyme", "'yes' ->rhyme", "'no' ->rhyme", "'new rhyme' ->initRhyme"]
-
-
 			}
 		},
 		grammar: {
@@ -516,80 +527,6 @@ var testMaps = {
 		},
 	},
 
-	test3: {
-		states: {
-			origin: {
-				onEnter: "playerName='#name#' restartCount++ coins=10 '#greetings# #/playerName#'",
-				exits: ["->start", "wait:2 'start'->start", "wait:15 ->start"],
-			},
-
-			start: {
-				onEnter: "'#/playerName# starts'",
-				exits: ["->round"],
-			},
-
-			round: {
-				onEnter: "'You have #/coins# coins. Gamble, or hold?'",
-				exits: ["'NUMBER' ->gamble bet=INPUT_NUMBER", "'#gamble#' ->howMuch next='gamble' value='toSet'"],
-			},
-
-			howMuch: {
-				onEnter: "'How much?'",
-				exits: ["'#number#' ->(next) (toSet)=INPUT_NUMBER"]
-			},
-
-			gamble: {
-				onEnter: "'I\\'m rolling dice right now...'",
-				exits: ["(random()>.4) ->gamble_lose", "(random()>.4) ->gamble_win"]
-			},
-
-			gamble_lose: {
-				onEnter: "coins-=bet '#/playerName# loses #/bet#.'",
-				exits: ["priority:0 ->round", "coins<=0 ->lose"]
-			},
-
-			gamble_win: {
-				onEnter: "coins+=bet '#/playerName# wins #/bet#.'",
-				exits: ["priority:0 ->round"]
-			},
-			lose: {
-				onEnter: "'You have no coins left, you lose'",
-				exits: ["wait:5 ->origin"]
-			},
-
-		},
-		grammar: {
-			greetings: ["greetings", "hi", "hello", "welcome back"],
-			name: ["#adj# #animal#"],
-			adj: ["sleepy", "grumpy", "shy"],
-			animal: ["unicorn", "dragon", "corgi", "kitten"]
-		},
-		exits: ["'reset'->origin", "priority:0 '*' ->/ 'Sorry, I didn\\'t understand that'"],
-		initialBlackboard: {
-			x: 1.2235,
-			y: 2,
-			restartCount: 0,
-			eggs: [{
-				size: "large",
-				isStriped: true,
-				description: "green"
-			}, {
-				size: "small",
-				isStriped: true,
-				description: "red"
-			}, {
-				size: "tiny",
-				description: "pink"
-			}],
-			name: null,
-			hunger: 0,
-			affection: 0,
-			interactions: 0,
-			words: [],
-			tricks: [],
-
-		},
-	},
 	petSim: {
 		grammar: {
 			furTextureBase: ["fluffy", "curling", "smooth", "silky", "shiny", "iridescent", "long"],
@@ -738,127 +675,6 @@ var testMaps = {
 
 	},
 
-	trivia: {
-		name: "trivia",
-		states: {
-
-			origin: {
-				onEnter: "Welcome to Lucky Trivia",
-				exits: {
-					start: "->startRound shuffleQuestions() questionIndex=0 playerIndex=0 roundIndex=0 playerIndex=0"
-				},
-			},
-
-
-			setNicknamesStart: {
-				exits: "->setNicknameAsk playerIndex=0"
-			},
-
-			setNicknameAsk: {
-				onEnter: "Player #/playerIndex#, what's your name?",
-				exits: {
-					any: "* ->setNicknameGive (I guess that's a real name)",
-					silence: "wait:5 ->setNicknameGive (The quiet type, huh?)"
-				}
-			},
-
-			setNicknameGive: {
-				onEnter: "I'll call you #/players/playerIndex/{#playerIndex#}#",
-				exits: {
-					next: "playerIndex<playerCount ->setNicknameAsk + playerIndex",
-					done: "playerIndex=playerCount ->POP"
-				}
-			},
-
-			startRound: {
-				exits: "->q_setQuestion PUSH playerIndex+=1 questionIndex+=1"
-			},
-
-
-			q_setQuestion: {
-				exits: "->q_setPlayer"
-			},
-			q_setPlayer: {
-				onEnter: "Player #/playerCount#, are you ready for a question about #/question/topic",
-				exits: {
-					ask: "yes ->q_ask",
-					wait: "wait:5 ->q_ask"
-				}
-			},
-			q_ask: {
-				onEnter: "#/question/q#",
-				exits: {
-					correct: "question.a[0] ->q_correct",
-					wrong0: "question.a[1] ->q_incorrect",
-					wrong1: "question.a[2] ->q_incorrect",
-					wrong2: "question.a[3] ->q_incorrect",
-					unknown: "* ->q_notUnderstood"
-				},
-			},
-
-			q_incorrect: {
-				onEnter: "Sorry, the answer is #/question/a[0]#",
-				exits: "->POP"
-			},
-			q_correct: {
-				onEnter: "That's right, the answer is #/question/a[0]#",
-				exits: "->POP"
-			},
-			q_notUnderstood: {
-				onEnter: "Sorry, I didn't understand that.",
-
-				exits: "->q_ask"
-			}
-		},
-
-		fxns: {
-
-			shuffleQuestions: function() {
-				var obj = this.map.stateSpace;
-				console.log("shuffle");
-				obj.questions = obj.questionList.slice(0);
-				console.log(obj.questions);
-			}
-		},
-
-		stateSpace: {
-			questionList: [{
-				cat: "geography",
-				q: "What is the capital of Djibouti?",
-				a: ["Djibouti", "Abbe", "Aden", "River City"],
-			}, {
-				cat: "geography",
-				q: "What is the only city in the world located on two continents?",
-				a: ["Istanbul", "Cairo", "London", "Reyjavik"],
-			}, {
-				cat: "pop culture",
-				q: "How many spells are mentioned in the Harry Potter books?",
-				a: ["75", "240", "12", "47"],
-			}, {
-				cat: "pop culture",
-				q: "What is Beyonce's middle name?",
-				a: ["Giselle", "Adele", "Carter", "Fierce"]
-			}, {
-				cat: "science",
-				q: "What is the farthest planet from the Sun?",
-				a: ["Neptune", "Uranus", "Cleo", "Pluto"]
-			}, {
-				cat: "animals",
-				q: "Cygnophobia is fear of what animal?",
-				a: ["swans", "spiders", "snakes", "seals"]
-			}, {
-				cat: "animals",
-				q: "Brigadier Sir Nils Olav was given a knighthood by Norway in 2008.  What species is he?",
-				a: ["penguin", "polar bear", "horse", "reindeer"]
-			}, {
-				cat: "science",
-				q: "Of the four fundamental physical forces, which is the only one that can both push, and pull?",
-				a: ["Electromagnetic", "Gravity", "Strong Nuclear", "Love"]
-			}],
-		}
-	},
-
-
 
 	besties: {
 		states: {
@@ -945,46 +761,33 @@ var testMaps = {
 		states: {
 			origin: {
 				onEnterSay: "I am a lost tesla\ntrying to get home",
-				exits: {
-
-					timeout: "wait:1 ->driving",
-				}
+				exits: ["wait:1 ->driving"]
 			},
 
 			update: {
 				onEnterSay: "#origin#",
-				exits: {
-					timeout: "wait:3 ->driving",
-					timeout2: "wait:3 ->setRadio",
+				exits: ["wait:3 ->driving", "wait:3 ->setRadio"]
 					//	ask: "input:(where are you) ->update"
-				}
 			},
+
 
 
 			setRadio: {
 				onEnterSay: "#activateRadio#\n",
-				exits: {
+				exits: ["wait:2 ->radioStation"]
 
-					timeout: "wait:2 ->radioStation",
-				}
 			},
 
 			radioStation: {
 				onEnterSay: "#radioDesc#",
-				exits: {
-
-					timeout: "wait:2 ->driving",
-				}
+				exits: ["wait:2 ->driving"]
 			},
 
 			driving: {
 				onEnterPlay: "cc/Syme 0#lowdigit#.wav",
 
 				onEnterSay: "driving\n",
-				exits: {
-
-					timeout: "wait:4 ->update",
-				}
+				exits: ["wait:4 ->update"]
 			},
 		},
 		grammar: {
@@ -1106,181 +909,5 @@ var testMaps = {
 		},
 
 	},
-	testActions: {
-
-
-		name: "test actions",
-		states: {
-			origin: {
-				onEnterDo: "val=0",
-				onEnterSay: "Origin",
-				exits: {
-
-					increment: "->math",
-				}
-			},
-
-			math: {
-				exits: {
-					sound: "val<4 ->math val+=1",
-					sound2: "val>3 ->math val*=.5",
-
-				}
-			},
-
-		},
-		grammar: {
-			digit: "01234567890".split(""),
-			animal: ["corgi", "cobra", "zebra", "oppossum", "moose", "polar bear", "unicorn", "dragon", "tiger", "puma", "ocelot", "okapi", "giraffe", "emu", "flamingo"],
-		},
-
-		initialBlackboard: {
-			round: 0,
-			playerCount: 4,
-			x: 47,
-			currentPlayer: 0,
-			totalRounds: 5,
-			testNumber: 1,
-			players: [{
-				name: "OpalOctopus",
-				score: 0,
-				awards: ["best-looking", "most popular"],
-				bestFriend: 3
-			}, {
-				name: "PrettyPanda",
-				score: 23,
-				bestFriend: 0
-			}, {
-				name: "CocoaAnaconda",
-				score: 34,
-				bestFriend: 1
-			}, {
-				name: "IronBeaver",
-				score: 21,
-				awards: ["most likely to success", "coolest house"],
-				bestFriend: 0
-			}]
-		}
-
-	},
-
-	testActions2: {
-		name: "test actions",
-		states: {
-			origin: {
-				onEnterDo: "voice=0 sound=0",
-				onEnterSay: "Origin",
-				exits: {
-					sound: "->playSound",
-					sayThing: "->sayThing",
-					increment: "->math",
-				}
-			},
-
-			math: {
-				exits: {
-					sound: "->playSound",
-					sound2: "->playSound2",
-					sayThing: "->sayThing",
-				}
-			},
-
-			playSound: {
-				onEnterDo: "sound+=1",
-				onEnterPlay: "cc/jobro__piano-ff-04#digit#.wav",
-				exits: {
-					sayThing: "->math",
-				}
-			},
-
-			playSound2: {
-				onEnterDo: "sound+=1",
-				onEnterPlay: "cc/sandyrb__tubular-bell-strike-00#digit#.wav",
-				exits: {
-					math: "->math",
-				}
-			},
-
-			sayThing: {
-				onEnterDo: "voice+=1",
-				onEnterSay: "#animal#",
-				exits: {
-					sayThing: "->math",
-				}
-			},
-		},
-		grammar: {
-			digit: "01234567890".split(""),
-			animal: ["corgi", "cobra", "zebra", "oppossum", "moose", "polar bear", "unicorn", "dragon", "tiger", "puma", "ocelot", "okapi", "giraffe", "emu", "flamingo"],
-		}
-
-	},
-
-
-};
-
-
-var rawMap = {
-	name: "testMap",
-	states: {
-
-		origin: {
-			exits: {
-				start: "wait:5 ->room0 money=0 xp=0"
-			}
-		},
-
-		room0: {
-			onEnter: "You are in a green room",
-			exitSets: ["gameExits"],
-			exits: {
-				n: "(n) ->room1"
-			}
-		},
-
-		room1: {
-			onEnter: "You are in a red room",
-			exitSets: ["gameExits"],
-			exits: {
-				s: "(s) ->room0",
-				e: "(e) ->room2"
-			}
-		},
-
-		room2: {
-			onEnter: "You are in a blue room",
-			exitSets: ["gameExits"],
-			exits: {
-				w: "(w) ->room1"
-			}
-		},
-
-		inventory: {
-			onEnter: "You have stuff",
-			exits: {
-				// template match 
-				lookAt: "(#lookat# #item#) ->* say(you look at the #item#)",
-				back: "(#back#) ->POP",
-			}
-		},
-
-		map: {
-			onEnter: "There are rooms",
-			exits: {
-				lookAt: "(#lookAtMap#) ->* listMap()",
-				back: "(#back#) ->POP"
-			}
-		},
-	},
-	exits: {
-		useMap: "(map) ->map PUSH",
-		useInventory: "(inventory) ->inventory PUSH"
-	},
-
-	exitSets: {
-		gameExits: ["useMap", "useInventory"]
-	}
-
-
 
 };

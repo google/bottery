@@ -1,18 +1,3 @@
-// Copyright 2017 Google Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-
 /* 
  * Conversation map
  */
@@ -53,6 +38,7 @@ function parseMapValue(raw) {
 
 function parseMapPath(raw) {
 	// Address
+
 	var s = splitOnUnprotected(raw, ".", false, openChars, closeChars);
 
 	var parsed = {
@@ -71,11 +57,15 @@ function parseMapPath(raw) {
 			closeChars: closeChars
 		});
 
+
 		if (s2[0].depth === 0) {
+
+
 			parsed.steps.push({
 				type: "text",
 				value: s2[0].inner
 			});
+
 
 			// cleanup
 			s2 = s2.filter(s => s.inner.trim().length > 0 || s.depth > 0);
@@ -127,7 +117,7 @@ function parseMapPath(raw) {
 //   POSSIBLE: if statements?
 function parseMapExpression(raw, sections) {
 	if (!raw) {
-		//console.warn("Non existant expression");
+		console.warn("Non existant expression");
 		return undefined;
 	}
 
@@ -146,7 +136,8 @@ function parseMapExpression(raw, sections) {
 	}
 
 	if (sections.length === 0) {
-		return undefined;
+		controls.addError("empty expression " + inQuotes(raw), parsed);
+		return parsed;
 	}
 
 
@@ -160,16 +151,28 @@ function parseMapExpression(raw, sections) {
 		});
 
 
-		if (parenSections.length > 2 || parenSections.length > 1 && parenSections[1].depth === 0) {
-			console.warn("malformed expression " + inQuotes(raw));
-			return undefined;
+		if (parenSections.length > 1) {
+
+			if (parenSections.length > 2) {
+				controls.addError("There's an error in this expression " + inQuotes(raw) + ", too many parenthesis", parsed);
+				return parsed;
+			}
+
+			if (parenSections[0].depth === 1) {
+				controls.addError("There's an error in this expression " + inQuotes(raw) + ", are your parenthesis closed?", parsed);
+				return parsed;
+			}
+
+			if (parenSections[1].depth === 0) {
+				controls.addError("There's an error in this expression " + inQuotes(raw) + ", are your parenthesis closed?", parsed);
+				return parsed;
+			}
 		}
 
 		// only contains in parenthesis
 		if (parenSections[0].depth === 1 && parenSections.length === 1) {
 			return parseMapExpression(raw.substring(1, raw.length - 1));
 		}
-
 
 		return parseMapValue(raw);
 	}
@@ -237,6 +240,7 @@ function expressionSectionsToString(sections) {
 
 
 function parseMapAction(raw) {
+
 	if (!raw)
 		return undefined;
 
@@ -246,7 +250,14 @@ function parseMapAction(raw) {
 	};
 
 	// Types of actions: string, obj, or array
+
+	// Action types: 
+	// In quotes, expand and output: "foo#bar#"
+	// Asterisk: push this state to the stack
+	// For: "action for value in array"
+	// Expression
 	if (isString(raw)) {
+
 
 		// Parse a parentheses-wrapped string action
 		if (isInParentheses(raw)) {
@@ -274,15 +285,17 @@ function parseMapAction(raw) {
 		// action for var in array
 		var forSections = splitOnUnprotected(raw, " for ", false, openChars, closeChars);
 		if (forSections.length > 1) {
-
+			console.log("FOR ACTION");
 			var s2 = splitOnUnprotected(forSections[1], " in ", false, openChars, closeChars);
 			parsed.actionType = "forEach";
 
 			parsed.key = s2[0].trim();
-			parsed.action = forSections[0];
+
+			parsed.action = parseMapAction(forSections[0]);
 			parsed.source = parseMapPath(s2[1].trim());
 			return parsed;
 		}
+
 
 		parsed.actionType = "expression";
 		var sections = splitOnUnprotected(raw, actionOperators, true, openChars, closeChars);
@@ -296,10 +309,21 @@ function parseMapAction(raw) {
 			if (sections.length < 3 || sections.length > 3) {
 				console.log("unclear action expression: " + inQuotes(raw));
 			}
+
+
 			parsed.actionType = "setter";
 			parsed.target = parseMapPath(sections[0]);
 			parsed.operator = sections[1].splitter;
-			parsed.expression = parseMapExpression(sections[2]);
+
+			// Is there a RHS for this assignment? Is that an issue?
+			if (sections[2]) {
+				parsed.expression = parseMapExpression(sections[2]);
+			} else {
+
+				if (!(parsed.operator === "++" || parsed.operator === "++")) {
+					console.warn(inQuotes(raw) + " is missing a right-hand expression for this assignment operation");
+				}
+			}
 
 
 
@@ -328,15 +352,17 @@ function parseMapAction(raw) {
 // x = index where (egg/index/color == INPUT)""  -> find all values of index, and return
 
 function parseMapCondition(raw) {
-	if (!raw) {
-		console.warn("empty condition");
-		return undefined;
-	}
-
 	var parsed = {
 		raw: JSON.stringify(raw),
 		type: "condition",
 	};
+
+
+	if (!raw) {
+		addError(parsed, "empty expression " + inQuotes(raw));
+		return parsed;
+	}
+
 
 	// Does this have a semicolon?
 	var sides = splitOnUnprotected(raw, ":", false, openChars, closeChars);
@@ -409,6 +435,13 @@ function parseState(raw, key) {
 		parsed.onEnter = parsed.onEnter.concat(s);
 	}
 
+	if (raw.onEnterPlay !== undefined) {
+		if (isString(raw.onEnterPlay))
+			raw.onEnterPlay = [raw.onEnterPlay];
+		var s = raw.onEnterPlay.map(s => parseMapAction("play(" + s + ")"));
+		parsed.onEnter = parsed.onEnter.concat(s);
+	}
+
 	// Sugared on-enter actions
 	if (raw.onEnterDoOne !== undefined) {
 
@@ -436,15 +469,22 @@ function parseState(raw, key) {
 		parsed.onEnter.push(fallDown);
 	}
 
-
+	// Parse all the exits and assign them unique keys
 	if (raw.exits) {
 		if (isString(raw.exits))
 			raw.exits = [raw.exits];
-		parsed.exits = raw.exits.map(parseExit);
+		parsed.exits = raw.exits.map(function(exitTemplate, index) {
+			var exit = parseExit(exitTemplate);
+			exit.key = key + "-exit" + index;
+			return exit;
+		});
 	}
 
 	if (raw.onEnterFxn) {
-		parsed.onEnterFxn = raw.onEnterFxn;
+		parsed.onEnter.push({
+			actionType: "fxn",
+			fxn: raw.onEnterFxn
+		});
 	}
 
 	return parsed;
@@ -482,7 +522,7 @@ function parseExit(raw) {
 
 			// Actions
 			var rawConditions = splitOnUnprotected(sections[0], " ", false, openChars, closeChars).filter(s => s.trim() !== "");
-			
+
 			var s1 = splitOnUnprotected(sections[1], " ", false, openChars, closeChars);
 			var rawActions = s1.slice(1).filter(s => s.trim() !== "");
 			var rawTarget = s1[0]
@@ -515,7 +555,8 @@ function parseMap(raw) {
 		exits: [],
 		states: [],
 		contentRecipes: raw.contentRecipes,
-		initialBlackboard: raw.initialBlackboard
+		initialBlackboard: raw.initialBlackboard,
+		settings: raw.settings
 	};
 
 	if (raw.exits) {
@@ -530,7 +571,6 @@ function parseMap(raw) {
 		$.each(raw.states, function(key, rawState) {
 			parsed.states[key] = parseState(rawState, key);
 		});
-
 	}
 
 
@@ -541,36 +581,39 @@ function parseMap(raw) {
 
 function performAction(action, pointer) {
 	if (!pointer)
-		console.warn("No pointer");
+		controls.addError("No pointer specified");
 
 
 	switch (action.actionType) {
+		case "fxn":
+			action.fxn.apply(pointer);
+			break;
 		case "doOne":
-			console.log("DO ONE")
 			for (var i = 0; i < action.options.length; i++) {
 				var opt = action.options[i];
 				var valid = true;
 				if (opt.condition) {
-
 					valid = evaluateCondition(opt.condition, pointer);
-					console.log(opt.condition.raw + " " + valid);
 				}
 
 				if (valid) {
-					console.log("select action", opt.action);
 					performAction(opt.action, pointer);
 					break;
 				}
 			}
 
 			break;
-		case "forEach":
 
+		case "forEach":
+			console.log(action);
 			var arr = pointer.get(action.source);
-			var keys = Object.keys(arr.children);
-			var path2 = action.source.raw;
+			var keys = Object.keys(arr);
+
+
 			keys.forEach(function(key) {
-				performAction(parseMapAction(action.action), pointer, arr.children[key]);
+				pointer.set(action.key, arr[key]);
+				console.log("set " + action.key + " " + arr[key]);
+				performAction(action.action, pointer);
 			});
 
 
@@ -591,6 +634,10 @@ function performAction(action, pointer) {
 					v2 = v0 + 1;
 					break;
 
+				case "--":
+					v2 = v0 - 1;
+					break;
+
 				case "-=":
 					v2 = v0 - v1;
 					break;
@@ -599,11 +646,30 @@ function performAction(action, pointer) {
 					v2 = v0 + v1;
 					break;
 
+				case "/=":
+					v2 = v0 / v1;
+					break;
+
+				case "*=":
+					v2 = v0 * v1;
+					break;
+				case "%=":
+					v2 = v0 % v1;
+					break;
+
+
+				case "^=":
+					v2 = Math.pow(v0, v1);
+					break;
+
 				case "=":
 					v2 = v1;
 					break;
 				default:
-					console.warn("Unknown action operator: " + inQuotes(action.operator));
+					{
+
+						console.warn("Unknown action operator: " + inQuotes(action.operator));
+					}
 			}
 
 			pointer.set(action.target, v2);
@@ -630,26 +696,25 @@ function performAction(action, pointer) {
 	}
 
 
-}
+};
 
 function evaluateExpression(node, pointer) {
-	if (!pointer)
-		console.warn("No pointer");
+	if (pointer === undefined || pointer === null)
+		controls.addError("no pointer for node " + inQuotes(node.raw), node);
+
 	if (node === undefined || node === null) {
-		console.warn("no expression");
+		controls.addError("no node specified");
 		return undefined;
 	}
-	if (pointer === undefined || pointer === null) {
-		console.warn("no pointer");
-	}
-
 
 
 	// Constants
 	if (node.type === "number" || node.type === "boolean" || node.type === "text") {
 
-		if (node.type === "text")
-			return pointer.flatten(node.value);
+		if (node.type === "text") {
+			var s = pointer.flatten(node.value);
+			return s;
+		}
 		return node.value;
 	}
 
@@ -676,6 +741,9 @@ function evaluateExpression(node, pointer) {
 	} else {
 		lhs = evaluateExpression(node.lhs, pointer);
 	}
+
+	if (node.rhs === undefined)
+		controls.addError("No RHS for expression " + inQuotes(node.raw));
 	rhs = evaluateExpression(node.rhs, pointer);
 
 	switch (node.operator) {
@@ -713,7 +781,7 @@ function evaluateExpression(node, pointer) {
 		default:
 			console.warn("unknown op " + node.operator);
 	}
-}
+};
 
 function evaluateCondition(condition, pointer) {
 	if (condition === undefined) {
@@ -757,4 +825,4 @@ function evaluateCondition(condition, pointer) {
 	}
 
 
-}
+};

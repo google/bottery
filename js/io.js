@@ -1,23 +1,9 @@
-// Copyright 2017 Google Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-
 /*
  * IO functionality
  * accept input
  * create AI output
  */
+
 
 
 var io = {
@@ -30,6 +16,25 @@ var io = {
 			id: "debug-log",
 		}).appendTo($("#panel-debug .panel-content"));
 
+
+	},
+
+
+	loadMap: function(id, editVersion) {
+		var found = localStorage.getItem(id);
+		if (!found)
+			return undefined;
+
+		found = JSON.parse(found);
+	},
+
+
+	saveData: function(map, key, val) {
+
+		localStorage.setItem("data-" + map.settings.id + "-" + key, val);
+	},
+
+	loadMap: function(id) {
 
 	},
 
@@ -80,7 +85,7 @@ var io = {
 
 			// Allow finishing events with either event end, or timeout (for broken audio)
 			aud.addEventListener("ended", finish);
-			//setTimeout(finish, text.length * 50 + 200);
+			setTimeout(finish, text.length * 150 + 500);
 
 		}
 
