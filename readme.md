@@ -1,6 +1,8 @@
 # Bottery
 ## A conversational agent prototyping platform by katecompton@
 
+(This is not an official Google product)
+
 ## What is this?
 
 Bottery is a syntax, editor, and simulator for prototyping **generative contextual conversations** modeled as **finite state machines**
