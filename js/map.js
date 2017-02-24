@@ -234,6 +234,15 @@ function parseMapExpression(raw, sections) {
 	return parsed;
 }
 
+
+function splitBySpaces(s) {
+	if (s === undefined || s === null)
+		return [];
+	if (Array.isArray(s))
+		return s;
+	return splitOnUnprotected(s, " ", false, openChars, closeChars).filter(s2 => s2.trim() !== "");
+}
+
 function expressionSectionsToString(sections) {
 	return sections.map(s => isString(s) ? s : s.splitter).join(" ");
 }
@@ -403,22 +412,23 @@ function parseState(raw, key) {
 	var parsed = {
 		raw: JSON.stringify(raw),
 		type: "state",
-		chips: raw.chips,
+		chips: [],
 		key: key,
 		exits: [],
 		onEnter: [],
 		onExit: []
 	};
 
+	if (raw.chips)
+		parsed.chips = raw.chips;
+
 	if (raw.onEnter) {
 
 		// Kinds of onEnter actions
 		// array, single string
 		// create:egg(5,2)
-		var actionsRaw = raw.onEnter;
-		if (isString(actionsRaw)) {
-			actionsRaw = splitOnUnprotected(raw.onEnter, " ", false, openChars, closeChars).filter(s => s.trim().length > 0);
-		}
+		var actionsRaw = splitBySpaces(raw.onEnter);
+
 
 		parsed.onEnter = actionsRaw.map(function(s) {
 			return parseMapAction(s);
@@ -452,7 +462,7 @@ function parseState(raw, key) {
 		};
 
 		for (var i = 0; i < raw.onEnterDoOne.length; i++) {
-			var todo = splitOnUnprotected(raw.onEnterDoOne[i], " ", false, openChars, closeChars);
+			var todo = splitBySpaces(raw.onEnterDoOne[i]);
 			if (todo.length === 1) {
 				fallDown.options.push({
 					action: parseMapAction(todo[0]),
@@ -469,23 +479,38 @@ function parseState(raw, key) {
 		parsed.onEnter.push(fallDown);
 	}
 
-	// Parse all the exits and assign them unique keys
-	if (raw.exits) {
-		if (isString(raw.exits))
-			raw.exits = [raw.exits];
-		parsed.exits = raw.exits.map(function(exitTemplate, index) {
-			var exit = parseExit(exitTemplate);
-			exit.key = key + "-exit" + index;
-			return exit;
-		});
-	}
-
+	// Add the onEnterFxn (a function with custom JS)
+	// ALERT: this is the only possibly non-safe-json data in the structure
 	if (raw.onEnterFxn) {
 		parsed.onEnter.push({
 			actionType: "fxn",
 			fxn: raw.onEnterFxn
 		});
 	}
+
+	// Parse all the exits and assign them unique keys
+	if (raw.exits) {
+		// single exit? wrap it
+		if (isString(raw.exits))
+			raw.exits = [raw.exits];
+
+
+		parsed.exits = raw.exits.map(function(exitTemplate, index) {
+			var exit = parseExit(exitTemplate);
+			if (exit.chip) {
+
+console.log(parsed.chips);
+			parsed.chips.push(exit.chip);
+				console.log(exit.chip);
+				console.log(parsed.chips);
+			}
+			exit.key = key + "-exit" + index;
+			return exit;
+		});
+
+
+	}
+
 
 	return parsed;
 }
@@ -500,45 +525,76 @@ function parseExit(raw) {
 		return undefined;
 
 
+
 	var parsed = {
-		raw: JSON.stringify(raw),
+		raw: raw,
 		type: "exit",
+		conditions: [],
+		actions: [],
 		key: "exit" + exitCount++,
 	};
 
-
+	// Many exits?
 	if (Array.isArray(raw)) {
 		return raw.map(parseExit);
 	}
 
-	if (isString(raw)) {
-		// Split on the target ->
-		var sections = splitOnUnprotected(raw, "->", false, openChars, closeChars);
+	switch (typeof raw) {
 
-		// No arrow found, not a real exits?
-		if (sections.length === 1) {
-			controls.addError("No exit location provided for exit " + inQuotes(raw) + ", are you missing a '->'?");
-		} else {
+		// An object-specified exit
+		case "object":
+			parsed.raw = JSON.stringify(raw);
 
-			// Actions
-			var rawConditions = splitOnUnprotected(sections[0], " ", false, openChars, closeChars).filter(s => s.trim() !== "");
 
-			var s1 = splitOnUnprotected(sections[1], " ", false, openChars, closeChars);
-			var rawActions = s1.slice(1).filter(s => s.trim() !== "");
-			var rawTarget = s1[0]
 
-			parsed.actions = rawActions.map(parseMapAction);
-			parsed.conditions = rawConditions.map(parseMapCondition);
-			// remove conditions from priority and move to its own thing
-			parsed.conditions = parsed.conditions.filter(function(cond) {
-				if (cond.target === "priority") {
-					parsed.priority = cond.expression;
-					return false;
-				}
-				return true;
-			})
-			parsed.target = parseMapTarget(rawTarget);
-		}
+			parsed.actions = splitBySpaces(raw.actions).map(parseMapAction);
+			parsed.conditions = splitBySpaces(raw.conditions).map(parseMapCondition);
+			parsed.target = parseMapTarget(raw.target);
+
+			if (raw.chip !== undefined) {
+				parsed.chip = raw.chip;
+
+
+				// TODO this requires an OR statement for proper functionality
+
+				parsed.conditions.push(parseMapCondition(inQuotes(parsed.chip)));
+			}
+
+
+			break;
+
+			// A string-specified exit
+			// Break it apart into conditions, a target, and postactions
+		case "string":
+
+			// Split on the target ->
+			var sections = splitOnUnprotected(raw, "->", false, openChars, closeChars);
+
+			// No arrow found, not a real exits?
+			if (sections.length === 1) {
+				controls.addError("No exit location provided for exit " + inQuotes(raw) + ", are you missing a '->'?");
+			} else {
+
+				// Actions
+				var rawConditions = splitBySpaces(sections[0]);
+
+				var s1 = splitBySpaces(sections[1]);
+				var rawActions = s1.slice(1).filter(s => s.trim() !== "");
+				var rawTarget = s1[0]
+
+				parsed.actions = rawActions.map(parseMapAction);
+				parsed.conditions = rawConditions.map(parseMapCondition);
+				// remove conditions from priority and move to its own thing
+				parsed.conditions = parsed.conditions.filter(function(cond) {
+					if (cond.target === "priority") {
+						parsed.priority = cond.expression;
+						return false;
+					}
+					return true;
+				})
+				parsed.target = parseMapTarget(rawTarget);
+			}
+			break;
 	}
 
 	return parsed;
@@ -558,12 +614,6 @@ function parseMap(raw) {
 		initialBlackboard: raw.initialBlackboard,
 		settings: raw.settings
 	};
-
-	if (raw.exits) {
-		parsed.exits = raw.exits.map(function(rawExit) {
-			return parseExit(rawExit);
-		});
-	}
 
 	if (raw.states) {
 		parsed.states = {};

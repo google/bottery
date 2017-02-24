@@ -53,8 +53,12 @@ var io = {
 			// Using an audio object
 			var aud = new Audio(hollyPrefix + singleText);
 
+			var msg = new SpeechSynthesisUtterance(singleText);
+			window.speechSynthesis.speak(msg);
+			/*
 			aud.play();
 			aud.volume = Math.pow(app.voiceVolume, 2);
+*/
 
 			// Interrupting a current voice output?
 			if (app.speaking)
@@ -83,9 +87,11 @@ var io = {
 				}
 			}
 
+			msg.onend = finish;
+
 			// Allow finishing events with either event end, or timeout (for broken audio)
 			aud.addEventListener("ended", finish);
-			setTimeout(finish, text.length * 150 + 500);
+			setTimeout(finish, singleText.length * 100 + 100);
 
 		}
 

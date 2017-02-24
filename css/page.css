@@ -1,7 +1,7 @@
 body {
-background-color: hsl(190, 4%, 56%);
+	background-color: hsl(190, 4%, 56%);
 	
-font-family: 'Roboto-light', sans-serif;
+	font-family: 'Roboto-light', sans-serif;
 
 }
 .ui-widget{font-size:12px;}

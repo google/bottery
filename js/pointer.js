@@ -26,7 +26,7 @@ Pointer.prototype.set = function(path, val) {
 
 
 	var steps = path.steps.map(step => step.value !== undefined ? step.value : step);
-	
+
 	var valid = this.blackboard.setFromPath(steps, val, this);
 
 	// resave the bbo
@@ -34,7 +34,7 @@ Pointer.prototype.set = function(path, val) {
 	var last = steps[steps.length - 1];
 
 	if (steps.length === 1 && steps[0].startsWith("_")) {
-			io.saveData(app.map, steps[0], val)
+		io.saveData(app.map, steps[0], val)
 	}
 }
 
@@ -193,7 +193,7 @@ Pointer.prototype.flatten = function(rule) {
 		worldObject: this.blackboard
 	});
 
-console.log(node);
+
 	if (node.finished !== undefined)
 		return node.finished;
 	return node;
@@ -221,9 +221,11 @@ Pointer.prototype.enterState = function() {
 
 	// Make chips
 	if (this.currentState.chips) {
+		if (isString(this.currentState.chips))
+			this.currentState.chips = [this.currentState.chips];
 		chat.setChips(this.currentState.chips.map(function(chip) {
 			var s = pointer.flatten(chip);
-			console.log(s);
+
 			return {
 				displayText: s,
 				inputText: s
@@ -309,9 +311,7 @@ Pointer.prototype.collectExits = function() {
 				pointer.deselectExit(exit);
 			} else {
 				pointer.selectExit(exit);
-
 			}
-
 		});
 
 		var exitName = $("<div/>", {

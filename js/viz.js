@@ -40,31 +40,40 @@ var viz = {
 	},
 
 
-	createExitData: function(exit, originalID) {
+	createExitData: function(exit, originalID, statesReferenced) {
 
-		var targetKey = exit.target.raw;
-		var target = "state-" + targetKey;
+		if (exit.target) {
 
-		// self
-		if (targetKey === "self") {
-			target = originalID;
-		}
 
-		return {
-			data: {
-				target: target,
-				id: "exit-" + exit.key,
-				label: exit.label,
+			var targetKey = exit.target.raw;
+			var target = "state-" + targetKey;
 
-			},
-			classes: "exit"
+			// self
+			if (targetKey === "self") {
+				target = originalID;
+			}
+			if (statesReferenced[targetKey] === undefined)
+				statesReferenced[targetKey] = 0;
+			statesReferenced[targetKey]++;
+
+			return {
+				data: {
+					target: target,
+					id: "exit-" + exit.key,
+					label: exit.label,
+
+				},
+				classes: "exit"
+			}
+		} else {
+			console.warn("No exit data for " + inQuotes(exit.raw));
 		}
 	},
 
 	mapToCytoData: function(map) {
 
-		console.log(map);
 
+		var statesReferenced = {};
 		var cytoData = [];
 		$.each(map.states, function(key, state) {
 			var stateID = "state-" + state.key;
@@ -79,12 +88,29 @@ var viz = {
 
 			$.each(state.exits, function(key, exit) {
 
-				var exitData = viz.createExitData(exit, stateID);
-				exitData.data.source = stateID;
-				cytoData.push(exitData);
+				var exitData = viz.createExitData(exit, stateID, statesReferenced);
+				if (exitData) {
+					exitData.data.source = stateID;
+					cytoData.push(exitData);
+				}
 			});
 
 		});
+
+		$.each(statesReferenced, function(key, count) {
+			// create a dummy state
+			if (map.states[key] === undefined) {
+				var stateID = "state-" + key;
+				cytoData.push({
+					data: {
+						id: stateID,
+						label: key,
+					},
+					classes: "state state-missing"
+				});
+				console.warn("Missing state: " + inQuotes(key));
+			}
+		})
 
 		return cytoData;
 
@@ -92,89 +118,102 @@ var viz = {
 
 	createMapViz: function(map) {
 
-		this.cytoscape = cytoscape({
-			container: this.vizHolder,
-			elements: this.mapToCytoData(map),
-			style: [{
-				selector: '.state',
-				style: {
-					'width': 'label',
-					'color': 'rgb(255, 255, 255)',
-					'background-color': '#666',
-					'text-valign': 'center',
-					'shape': "roundrectangle",
-					'label': 'data(label)',
+		// find all missing states
+
+
+		try {
+			this.cytoscape = cytoscape({
+				container: this.vizHolder,
+				elements: this.mapToCytoData(map),
+				style: [{
+					selector: '.state',
+					style: {
+						'width': 'label',
+						'color': 'rgb(255, 255, 255)',
+						'background-color': '#666',
+						'text-valign': 'center',
+						'shape': "roundrectangle",
+						'label': 'data(label)',
+
+					}
+				}, {
+					selector: 'node.highlighted',
+					style: {
+						'background-color': 'blue',
+
+					}
+				}, {
+					selector: 'node.state-missing',
+					style: {
+						'background-color': 'darkred',
+
+					}
+				}, {
+					selector: 'node.active',
+					style: {
+						'background-color': 'blue',
+
+					}
+				}, {
+					selector: 'node.dot',
+					style: {
+						'color': 'rgb(255, 255, 255)',
+						'background-color': '#666',
+						'text-valign': 'center',
+						'shape': "roundrectangle",
+						'label': 'data(label)',
+
+						'shape': "ellipse",
+
+						'width': 20,
+						'height': 20
+					}
+				}, {
+					selector: '.exit',
+					style: {
+
+						'curve-style': 'bezier',
+						'line-color': 'grey',
+						'color': 'grey',
+						'label': 'data(label)',
+
+						'target-arrow-color': '#000',
+						'target-arrow-shape': 'triangle',
+
+						'font-size': '14',
+						'width': '2',
+					}
+				}, {
+					selector: 'edge.open',
+					style: {
+						'target-arrow-color': 'hsla(190, 100%, 60%)',
+						'line-color': 'hsla(190, 100%, 60%)',
+						'width': '7',
+
+					}
+				}],
+
+			});
+
+
+			this.cytoscape.layout({
+				name: 'cola',
+				infinite: false
+			});
+			this.cytoscape.on('tap', function(evt) {
+				console.log("tap");
+
+				if (evt.cyTarget.id) {
 
 				}
-			}, {
-				selector: 'node.highlighted',
-				style: {
-					'background-color': 'blue',
+			});
 
-				}
-			}, {
-				selector: 'node.active',
-				style: {
-					'background-color': 'blue',
-
-				}
-			}, {
-				selector: 'node.dot',
-				style: {
-					'color': 'rgb(255, 255, 255)',
-					'background-color': '#666',
-					'text-valign': 'center',
-					'shape': "roundrectangle",
-					'label': 'data(label)',
-
-					'shape': "ellipse",
-
-					'width': 20,
-					'height': 20
-				}
-			}, {
-				selector: '.exit',
-				style: {
-
-					'curve-style':'bezier',
-					'line-color': 'grey',
-					'color': 'grey',
-					'label': 'data(label)',
-
-					'target-arrow-color': '#000',
-					'target-arrow-shape': 'triangle',
-
-					'font-size': '14',
-					'width': '2',
-				}
-			}, {
-				selector: 'edge.open',
-				style: {
-					'target-arrow-color': 'hsla(190, 100%, 60%)',
-					'line-color': 'hsla(190, 100%, 60%)',
-					'width': '7',
-
-				}
-			}],
-
-		});
-
-		this.cytoscape.layout({
-			name: 'cola',
-			infinite: false
-		});
+		} catch (err) {
+			console.warn("Missing edge", err);
+		}
 
 
 
-		this.cytoscape.on('tap', function(evt) {
-			console.log("tap");
-
-			if (evt.cyTarget.id) {
-				var s = evt.cyTarget.id().split("-");
-				var id = s[1];
-				app.pointer.teleportTo(id);
-			}
-		});
 	},
 
 

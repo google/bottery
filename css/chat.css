@@ -1,3 +1,4 @@
+
 .chat-holder {
 
 	display: flex;
@@ -31,11 +32,11 @@
 }
 
 .chat-chip {
-	font-size: 14px;
+	font-size: 19px;
 	display: inline-block;
 	text-align: left;
 	max-width: 85%;
-	padding: 10px 14px;
+	padding: 4px 6px;
 	border-radius: 18px;
 	background-color: hsla(220, 10%, 40%, 1);
 	color : hsla(0, 0%, 100%, .94);

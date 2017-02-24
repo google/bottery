@@ -3,6 +3,14 @@
  */
 
 
+var labelEmoji = function() {
+	var start = 0;
+
+	
+	var next = s.indexOf(/\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F]/, start)
+
+}
+
 var chat = {
 	bubbles: [],
 
