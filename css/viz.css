@@ -15,206 +15,206 @@
  */
 
 .traceryparse-node {
-	margin: 1px;
-	padding: 1px 3px;
-	display: inline-block;
+  margin: 1px;
+  padding: 1px 3px;
+  display: inline-block;
 }
 
 
 .inspector-node {
-	box-shadow: 0px 1px 1px rgba(0, 0, 0, .6);
-	background-color: hsla(20, 20%, 90%,1);
-	
-	margin: 5px 3px;
-	border: 1px solid rgba(0, 0, 0, .3);
-	
-	overflow: hidden;
-	border-radius: 5px;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, .6);
+  background-color: hsla(20, 20%, 90%,1);
+  
+  margin: 5px 3px;
+  border: 1px solid rgba(0, 0, 0, .3);
+  
+  overflow: hidden;
+  border-radius: 5px;
 }
 
 
 .inspector-header {
-	margin: 0px;
-	background-color: hsla(20, 20%, 99%,.5);
+  margin: 0px;
+  background-color: hsla(20, 20%, 99%,.5);
 
-	overflow: hidden;
-	padding: 1px 2px;
-	box-shadow: 0px 1px 1px rgba(0, 0, 0, .1);
+  overflow: hidden;
+  padding: 1px 2px;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, .1);
 
 }
 
 .inspector-content {
-	margin: 0px;
-	
-	padding: 1px 2px;
+  margin: 0px;
+  
+  padding: 1px 2px;
 }
 
 
 .inspector-raw {
-	color: rgba(0, 0, 0, .4);
-	font-size: 10px;
-	margin: 0px;
-	font-weight: 100;
-	
-	padding: 1px 2px;
+  color: rgba(0, 0, 0, .4);
+  font-size: 10px;
+  margin: 0px;
+  font-weight: 100;
+  
+  padding: 1px 2px;
 }
 .inspector-node.inspector-map {
-	
+  
 }
 
 
 .inspector-node.inspector-state {
-	
+  
 }
 
 
 .inspector-colholder {
-	min-height: 20px;
-	display: flex;
-	flex-direction: horizontal
+  min-height: 20px;
+  display: flex;
+  flex-direction: horizontal
 }
 .inspector-col {
-	padding: 4px;
-	flex: 1;
+  padding: 4px;
+  flex: 1;
 }
 
 .inspector-action {
-	display: inline-block;
-	border-radius: 5px;
-	
-	background-color: hsla(20, 20%, 99%,1);
-	
-	
+  display: inline-block;
+  border-radius: 5px;
+  
+  background-color: hsla(20, 20%, 99%,1);
+  
+  
 }
 
 .path {
-	display: inline-block;
-	background-color: hsla(240, 80%, 57%, .3);
-	padding: 1px 2px ;
-	margin: 1px;
-	border: 1px solid hsla(240, 80%, 57%,1);;
+  display: inline-block;
+  background-color: hsla(240, 80%, 57%, .3);
+  padding: 1px 2px ;
+  margin: 1px;
+  border: 1px solid hsla(240, 80%, 57%,1);;
 }
 .path-step {
-	display: inline-block;
+  display: inline-block;
 }
 
 .op-chip {
 
-	background-color: hsla(290, 80%, 57%, .3);
-	padding: 1px 2px ;
-	margin: 1px;
-	border-radius: 10px;
-	border: 1px solid hsla(290, 80%, 57%,1);
+  background-color: hsla(290, 80%, 57%, .3);
+  padding: 1px 2px ;
+  margin: 1px;
+  border-radius: 10px;
+  border: 1px solid hsla(290, 80%, 57%,1);
 }
 
 
 .map-onEnter {
 background-color: hsla(290, 80%, 57%, .2);
-	
+  
 }
 
 .map-exits {
-	background-color: hsla(220, 80%, 57%, .2);
-	
+  background-color: hsla(220, 80%, 57%, .2);
+  
 }
 .small-label {
-	font-size: 10px;
+  font-size: 10px;
 }
 
 .stateID {
-	color: hsla(190, 80%, 27%, 1);
-	font-weight: bold;
-	font-size: 12px;
+  color: hsla(190, 80%, 27%, 1);
+  font-weight: bold;
+  font-size: 12px;
 }
 
 .chip {
-	display: inline-block;
-	border: 1px solid hsla(290, 80%, 57%,1);
+  display: inline-block;
+  border: 1px solid hsla(290, 80%, 57%,1);
 }
 
 .action-say .inspector-content {
-	padding: 3px;
-	font-family: monospace;
-	font-size: 10px;
-	background-color: hsla(40, 80%, 85%,1);
-	border: 2px solid hsla(40, 80%, 45%,.4);
-	
+  padding: 3px;
+  font-family: monospace;
+  font-size: 10px;
+  background-color: hsla(40, 80%, 85%,1);
+  border: 2px solid hsla(40, 80%, 45%,.4);
+  
 }
 
 .inspector-chip {
-	display: inline-block;
-	border-radius: 10px;
-	margin: 0px;
-	background-color: hsla(20, 20%, 99%,1);
-	font-weight: bold;
-	font-style: italic;
+  display: inline-block;
+  border-radius: 10px;
+  margin: 0px;
+  background-color: hsla(20, 20%, 99%,1);
+  font-weight: bold;
+  font-style: italic;
 
-	border: 1px solid hsla(0, 0%, 0%,.4);
-	padding: 2px 4px;
-	box-shadow: 0px 1px 1px rgba(0, 0, 0, .4);
+  border: 1px solid hsla(0, 0%, 0%,.4);
+  padding: 2px 4px;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, .4);
 
 }
 
 .map-exit {
-	display: block;
-	border-radius: 10px;
-	margin: 2px;
-	background-color: hsla(20, 20%, 99%,.2);
-	
+  display: block;
+  border-radius: 10px;
+  margin: 2px;
+  background-color: hsla(20, 20%, 99%,.2);
+  
 
-	
-	box-shadow: 0px 1px 1px rgba(0, 0, 0, .4);
+  
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, .4);
 }
 
 .traceryparse-node.path {
-	border-radius: 30px;
-	background-color: hsla(290, 80%, 57%, .3);
-	border: 1px solid hsla(290, 80%, 57%,1);
+  border-radius: 30px;
+  background-color: hsla(290, 80%, 57%, .3);
+  border: 1px solid hsla(290, 80%, 57%,1);
 }
 
 
 
 .map-address {
-	border-radius: 30px;
-	background-color: hsla(250, 80%, 57%, .3);
-	border: 1px solid hsla(250, 80%, 57%,1);
+  border-radius: 30px;
+  background-color: hsla(250, 80%, 57%, .3);
+  border: 1px solid hsla(250, 80%, 57%,1);
 
 }
 
 .map-array {
-	
-	border:none;
+  
+  border:none;
 
 }
 
 
 
 .map-action {
-		border-radius: 10px;
-	padding: 0px;
-	background-color: hsla(320, 80%, 27%, .3);
+    border-radius: 10px;
+  padding: 0px;
+  background-color: hsla(320, 80%, 27%, .3);
 }
 
 .map-parameters {
-	
-	border-radius: 30px;
-	background-color: hsla(250, 80%, 27%, .3);
-	
+  
+  border-radius: 30px;
+  background-color: hsla(250, 80%, 27%, .3);
+  
 }
 
 
 .operator {
-	border-radius: 40px;
-	background-color: hsla(20, 70%, 80%,.9);
-	
-	margin: 0px;
-	padding: 0px;
-	
+  border-radius: 40px;
+  background-color: hsla(20, 70%, 80%,.9);
+  
+  margin: 0px;
+  padding: 0px;
+  
 }
 
 .mapinfo-view {
-	display: flex;
-	flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
 
@@ -223,233 +223,233 @@ background-color: hsla(290, 80%, 57%, .2);
 
 
 .map-state {
-	border-radius: 10px;
-	background-color: hsla(20, 50%, 99%,.8);
-	
+  border-radius: 10px;
+  background-color: hsla(20, 50%, 99%,.8);
+  
 
-	border: 2px solid hsla(0, 0%, 0%,.4);
-	box-shadow: 0px 1px 1px rgba(0, 0, 0, .4);
+  border: 2px solid hsla(0, 0%, 0%,.4);
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, .4);
 }
 .map-const {
-	
+  
 }
 
 .map-action {
-	
+  
 }
 .map-condition {
-	border-radius: 10px;
-	
-	background-color: hsla(20, 20%, 99%,.2);
-	border: 2px solid hsla(0, 0%, 0%,.4);
-	
-	box-shadow: 0px 1px 1px rgba(0, 0, 0, .4);
+  border-radius: 10px;
+  
+  background-color: hsla(20, 20%, 99%,.2);
+  border: 2px solid hsla(0, 0%, 0%,.4);
+  
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, .4);
 }
 
 
 .map-say {
-	font-size: 12px;
-	padding: 2px 4px;
-	background-color: hsla(20, 20%, 99%,1);
-	border: 1px solid hsla(0, 0%, 0%,.4);
-	
-	box-shadow: 0px 1px 1px rgba(0, 0, 0, .4);
+  font-size: 12px;
+  padding: 2px 4px;
+  background-color: hsla(20, 20%, 99%,1);
+  border: 1px solid hsla(0, 0%, 0%,.4);
+  
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, .4);
 }
 
 .map-outputTemplate {
-	background-color: hsla(20, 90%, 90%,1);
-	border: 1px solid hsla(20, 90%, 30%,.6);
-	
-	border-radius: 10px 10px 1px 10px  !important;
+  background-color: hsla(20, 90%, 90%,1);
+  border: 1px solid hsla(20, 90%, 30%,.6);
+  
+  border-radius: 10px 10px 1px 10px  !important;
 }
 
 .map-inputTemplate {
-	background-color: hsla(220, 60%, 90%,1);
-	border: 1px solid hsla(220, 90%, 30%,.5);
-	border-radius: 10px 10px 10px 1px !important;
-	
+  background-color: hsla(220, 60%, 90%,1);
+  border: 1px solid hsla(220, 90%, 30%,.5);
+  border-radius: 10px 10px 10px 1px !important;
+  
 }
 
 #edit-controls {
-	display: flex;
-	flex-direction: row;
+  display: flex;
+  flex-direction: row;
 
 }
 
 #map-name {
-	text-align: left;
-	padding: 2px 6px;
-	display: inline-block;
-	flex: 1;
-	background-color: hsla(220, 60%, 95%,1);
+  text-align: left;
+  padding: 2px 6px;
+  display: inline-block;
+  flex: 1;
+  background-color: hsla(220, 60%, 95%,1);
 }
 
 #edit-json {
-	padding: 5px;
-	font-family: monospace;
-	white-space: pre;
+  padding: 5px;
+  font-family: monospace;
+  white-space: pre;
 }
 
 
 #edit-json .error {
-	box-shadow: inset 0px 0px 0px 3px hsla(20, 90%, 50%,1);
-	
+  box-shadow: inset 0px 0px 0px 3px hsla(20, 90%, 50%,1);
+  
 }
 
 .openable-section {
-	background-color: hsla(220, 60%, 90%,1);
-	height: 10;
-	flex: .2;
-	opacity: .4;
+  background-color: hsla(220, 60%, 90%,1);
+  height: 10;
+  flex: .2;
+  opacity: .4;
 }
 
 
 .openable-section.open {
-	background-color: hsla(320, 60%, 90%,1);
-	height: auto;
-	flex: 1;
-	opacity: 1;
+  background-color: hsla(320, 60%, 90%,1);
+  height: auto;
+  flex: 1;
+  opacity: 1;
 }
 
 .bbo {
-	vertical-align:top;
-	display: inline-block;
-	font-size: 12px;
-	padding: 1px;
-	background-color: hsla(220, 60%, 90%,.3);
+  vertical-align:top;
+  display: inline-block;
+  font-size: 12px;
+  padding: 1px;
+  background-color: hsla(220, 60%, 90%,.3);
 
 }
 .bbo-parent {
-	margin: 2px;
-	padding: 2px;
-	border: 1px solid hsla(220, 90%, 30%,.5);
-	border-radius: 5px;
-	
+  margin: 2px;
+  padding: 2px;
+  border: 1px solid hsla(220, 90%, 30%,.5);
+  border-radius: 5px;
+  
 }
 
 
 
 .bbo-childlabel {
-	font-weight: bold;
-	padding: 1px 5px 1px 1px;
-	background-color: hsla(270, 60%, 70%,.3);
-	display: inline-block;
+  font-weight: bold;
+  padding: 1px 5px 1px 1px;
+  background-color: hsla(270, 60%, 70%,.3);
+  display: inline-block;
 }
 .bbo-childline {
-	vertical-align:top;
-	
+  vertical-align:top;
+  
 }
 
 .traceryparse-node {
-	font-size: 10px;
+  font-size: 10px;
 }
 .mapinfo-stateview {
-	flex: 1;
-	height: 240px;
-	display: flex;
-	overflow: scroll;
-	flex-direction: column;
+  flex: 1;
+  height: 240px;
+  display: flex;
+  overflow: scroll;
+  flex-direction: column;
 }
 
 .mapinfo-bbview {
-	flex: 1;
+  flex: 1;
 }
 
 .mapinfo-state {
-	background-color: hsla(270, 60%, 70%,1);
+  background-color: hsla(270, 60%, 70%,1);
 }
 
 .mapinfo-exits {
 
-	flex: 1;
+  flex: 1;
 }
 
 .mapinfo-exit {
-	font-size: 12px;
-	padding: 2px 4px;
-	overflow: hidden;
-	border-radius: 15px;
-	margin: 1px;
-	display: flex;
-	flex-direction: row;
+  font-size: 12px;
+  padding: 2px 4px;
+  overflow: hidden;
+  border-radius: 15px;
+  margin: 1px;
+  display: flex;
+  flex-direction: row;
 }
 
 
 .mapinfo-exitname {
-	width: 90px;
-	padding: 2px;
-	display: inline-block;
-	
+  width: 90px;
+  padding: 2px;
+  display: inline-block;
+  
 }
 
 .mapinfo-exitstatus {
-	min-width: 10px;
-	min-height: 10px;
-	display: inline-block;
-	background-color: hsla(220, 20%, 30%,1);
+  min-width: 10px;
+  min-height: 10px;
+  display: inline-block;
+  background-color: hsla(220, 20%, 30%,1);
 }
 .mapinfo-conditions {
-	border-radius: 0px 10px 10px 0px;
-	flex: 1;
-	box-shadow: inset 1px 1px 4px  hsla(220, 50%, 30%,.4);
-	background-color: hsla(220, 50%, 80%,.3);
+  border-radius: 0px 10px 10px 0px;
+  flex: 1;
+  box-shadow: inset 1px 1px 4px  hsla(220, 50%, 30%,.4);
+  background-color: hsla(220, 50%, 80%,.3);
 }
 
 .map-function {
-	border-radius: 35px 0px 0px 35px;
-	
-	display: inline-block;	
-		background-color: hsla(220, 50%, 60%,.7);
-			border: 1px solid hsla(250, 90%, 30%,.3);
+  border-radius: 35px 0px 0px 35px;
+  
+  display: inline-block;  
+    background-color: hsla(220, 50%, 60%,.7);
+      border: 1px solid hsla(250, 90%, 30%,.3);
 }
 
 .fxn-name {
-	color: hsla(220, 90%, 30%,.7);
-	font-weight: bold;
-	background-color: hsla(220, 50%, 60%,0) !important; 
-	border:none !important;
+  color: hsla(220, 90%, 30%,.7);
+  font-weight: bold;
+  background-color: hsla(220, 50%, 60%,0) !important; 
+  border:none !important;
 
 }
 
 .map-const {
-	font-family: monospace;
-	border-radius: 15px;
-	padding: 2px 4px;
+  font-family: monospace;
+  border-radius: 15px;
+  padding: 2px 4px;
 }
 
 
 .map-number {
-		background-color: hsla(240, 60%, 80%,1);
-	border: 1px solid hsla(250, 90%, 30%,.3);
+    background-color: hsla(240, 60%, 80%,1);
+  border: 1px solid hsla(250, 90%, 30%,.3);
 }
 
 
 .map-text {
-		background-color: hsla(330, 0%, 80%,1);
-	border: 1px solid hsla(350, 0%, 30%,.3);
+    background-color: hsla(330, 0%, 80%,1);
+  border: 1px solid hsla(350, 0%, 30%,.3);
 }
 
 .map-text.path-step {
-	border-radius: 0px 30px 30px 0px;
-	background-color: hsla(320, 80%, 77%, .8);
-	border: 1px solid hsla(320, 80%, 37%,1);
+  border-radius: 0px 30px 30px 0px;
+  background-color: hsla(320, 80%, 77%, .8);
+  border: 1px solid hsla(320, 80%, 37%,1);
 }
 
 
 .mapinfo-condition {
-	border-radius: 15px;
-	padding: 2px 4px;
-	display: inline-block;
-	background-color: hsla(290, 20%, 60%,1);
-	border: 2px solid hsla(250, 90%, 30%,.3);
-	box-shadow:  inset 0px 0px 15px 0px hsla(220, 60%, 25%,.3);
+  border-radius: 15px;
+  padding: 2px 4px;
+  display: inline-block;
+  background-color: hsla(290, 20%, 60%,1);
+  border: 2px solid hsla(250, 90%, 30%,.3);
+  box-shadow:  inset 0px 0px 15px 0px hsla(220, 60%, 25%,.3);
 }
 
 .mapinfo-condition.open {
-	background-color: hsla(280, 60%, 80%,1);
-	border: 2px solid hsla(280, 90%, 30%,.6);
-	box-shadow:  inset 0px 0px 5px 0px hsla(20, 60%, 45%,1);
-	
+  background-color: hsla(280, 60%, 80%,1);
+  border: 2px solid hsla(280, 90%, 30%,.6);
+  box-shadow:  inset 0px 0px 5px 0px hsla(20, 60%, 45%,1);
+  
 }
 
 
@@ -457,26 +457,26 @@ background-color: hsla(290, 80%, 57%, .2);
 
 .mapinfo-condition.override {
 
-	border: 2px solid hsla(220, 90%, 30%,.5);
-	
+  border: 2px solid hsla(220, 90%, 30%,.5);
+  
 }
 .mapinfo-exit.open {
-	background-color: hsla(290, 60%, 90%,1);
-	border: 2px solid hsla(220, 90%, 50%,.5);
-	
+  background-color: hsla(290, 60%, 90%,1);
+  border: 2px solid hsla(220, 90%, 50%,.5);
+  
 }
 
 .mapinfo-exit {
-	transition: all .12s ease-in-out;
-	background-color: hsla(280, 20%, 70%,1);
-	border: 2px solid hsla(240, 90%, 30%,.2);
+  transition: all .12s ease-in-out;
+  background-color: hsla(280, 20%, 70%,1);
+  border: 2px solid hsla(240, 90%, 30%,.2);
 }
 
 .mapinfo-exit.selected {
-	box-shadow:  1px 1px 2px 2px rgba(0, 0, 0, 1), 0px 0px 0px 5px hsla(200, 90%, 60%,.8);
+  box-shadow:  1px 1px 2px 2px rgba(0, 0, 0, 1), 0px 0px 0px 5px hsla(200, 90%, 60%,.8);
 }
 
 .mapinfo-exit.selected.active {
-	margin: 12px 4px;
-	background-color: hsla(230, 50%, 90%,1);
+  margin: 12px 4px;
+  background-color: hsla(230, 50%, 90%,1);
 }

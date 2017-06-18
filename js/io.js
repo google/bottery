@@ -19,207 +19,200 @@
  */
 
 
-
 var io = {
-	outputQueue: [],
+  outputQueue: [],
 
-	lastOutput: 0,
+  lastOutput: 0,
 
-	init: function() {
-		io.logHolder = $("<div/>", {
-			id: "debug-log",
-		}).appendTo($("#panel-debug .panel-content"));
-
-
-	},
+  init: function() {
+    io.logHolder = $("<div/>", {
+      id: "debug-log",
+    }).appendTo($("#panel-debug .panel-content"));
+  },
 
 
-	loadMap: function(id, editVersion) {
-		var found = localStorage.getItem(id);
-		if (!found)
-			return undefined;
+  loadMap: function(id, editVersion) {
+    var found = localStorage.getItem(id);
+    if (!found)
+      return undefined;
 
-		found = JSON.parse(found);
-	},
-
-
-	saveData: function(map, key, val) {
-
-		localStorage.setItem("data-" + map.settings.id + "-" + key, val);
-	},
-
-	loadMap: function(id) {
-
-	},
+    found = JSON.parse(found);
+  },
 
 
-	textToSpeech: function(text, onFinish, onFinishEach) {
+  saveData: function(map, key, val) {
+    localStorage.setItem("data-" + map.settings.id + "-" + key, val);
+  },
 
-		var hollyPrefix = "https://voice-search-prod.sandbox.google.com/synthesize?sky=rad_b924-18a3-c08b-451c&client=webpatts&lang=en-us&engine=Phonetic+Arts&name=" + voices[app.voice] + "&enc=mpeg&speed=" + app.voiceSpeed.toFixed(2) + "&text=";
-		if (!Array.isArray(text)) {
-			text = [text];
-		}
-		var index = 0;
+  loadMap: function(id) {
 
-		function iterate() {
-			var singleText = text[index];
-
-			// Using an audio object
-			var aud = new Audio(hollyPrefix + singleText);
-
-			var msg = new SpeechSynthesisUtterance(singleText);
-			window.speechSynthesis.speak(msg);
-			/*
-			aud.play();
-			aud.volume = Math.pow(app.voiceVolume, 2);
-*/
-
-			// Interrupting a current voice output?
-			if (app.speaking)
-				console.warn("Voice interrupt");
-
-			app.speaking = true;
-
-			var finished = false;
-
-			function finish() {
-				if (!finished) {
-					console.log("finish speaking");
-					app.speaking = false;
-
-					if (onFinishEach)
-						onFinishEach(singleText);
-
-					index++;
-					if (index < text.length) {
-						iterate();
-					} else {
-						if (onFinish)
-							onFinish();
-					}
-					finished = true;
-				}
-			}
-
-			msg.onend = finish;
-
-			// Allow finishing events with either event end, or timeout (for broken audio)
-			aud.addEventListener("ended", finish);
-			setTimeout(finish, singleText.length * 100 + 100);
-
-		}
-
-		iterate();
-	},
+  },
 
 
-	playSound: function(filename, volume) {
-		if (volume === undefined)
-			volume = .8;
+  textToSpeech: function(text, onFinish, onFinishEach) {
 
-		var aud = new Audio("audio/" + filename);
-		//aud.setVelocity(Math.random()),
-		aud.volume = Math.pow(app.sfxVolume * volume, 2);
-		aud.play();
-	},
+    var hollyPrefix = "https://voice-search-prod.sandbox.google.com/synthesize?sky=rad_b924-18a3-c08b-451c&client=webpatts&lang=en-us&engine=Phonetic+Arts&name=" + voices[app.voice] + "&enc=mpeg&speed=" + app.voiceSpeed.toFixed(2) + "&text=";
+    if (!Array.isArray(text)) {
+      text = [text];
+    }
+    var index = 0;
 
-	output: function(s, onFinishEach, onFinish) {
+    function iterate() {
+      var singleText = text[index];
 
-		if (!Array.isArray(s)) {
-			if (!isString(s)) {
-				s = [s + ""];
-			} else {
-				s = s.split("\n");
-			}
-		}
+      // Using an audio object
+      var aud = new Audio(hollyPrefix + singleText);
 
+      var msg = new SpeechSynthesisUtterance(singleText);
+      window.speechSynthesis.speak(msg);
+      /*
+      aud.play();
+      aud.volume = Math.pow(app.voiceVolume, 2);
+       */
 
-		// remove any empty strings
-		s = s.filter(function(s2) {
-			return s2.trim().length > 0;
-		});
+      // Interrupting a current voice output?
+      if (app.speaking)
+        console.warn("Voice interrupt");
 
-		// for each section to say, add it to the queue 
-		// with handlers on what to do when its done outputting
-		for (var i = 0; i < s.length; i++) {
+      app.speaking = true;
 
-			var s2 = {
-				data: s[i],
-			}
-			if (i < s.length - 1) {
-				s2.onFinish = onFinishEach;
-			} else {
-				if (onFinish)
-					s2.onFinish = function() {
-						onFinish();
-						if (onFinishEach)
-							onFinishEach();
-					}
-			}
-			io.outputQueue.push(s2);
-		}
+      var finished = false;
 
+      function finish() {
+        if (!finished) {
+          console.log("finish speaking");
+          app.speaking = false;
 
-		io.attemptOutput();
-	},
+          if (onFinishEach)
+            onFinishEach(singleText);
 
-	attemptOutput: function() {
+          index++;
+          if (index < text.length) {
+            iterate();
+          } else {
+            if (onFinish)
+              onFinish();
+          }
+          finished = true;
+        }
+      }
 
-		var section = io.outputQueue.shift();
+      msg.onend = finish;
 
-		if (section && !io.isOccupied) {
+      // Allow finishing events with either event end, or timeout (for broken audio)
+      aud.addEventListener("ended", finish);
+      setTimeout(finish, singleText.length * 100 + 100);
 
-			// Occupy this channel when in use
-			io.isOccupied = true;
+    }
 
-			// Callback on text if text-only
-
-			// Activate Chat with timer	
-			chat.say(0, section.data);
-
-			// on finish
-			function outputDone() {
-				if (section.onFinish)
-					section.onFinish();
-				io.isOccupied = false;
-				io.attemptOutput();
-			}
-
-			if (app.outputMode === "text") {
-				var readTime = Math.sqrt(section.data.length) * 50 + 200;
-				setTimeout(function() {
-					outputDone();
-				}, readTime);
-			} else {
-
-				io.textToSpeech(section.data, function() {
-					outputDone();
-				});
-			}
+    iterate();
+  },
 
 
-			io.debugLog("Ouput" + inParens(io.outputMode) + ":" + inQuotes(section.data));
-		} else {
-			// push it back on the queue
-			if (section !== undefined)
-				io.outputQueue.unshift(section);
-		}
-	},
+  playSound: function(filename, volume) {
+    if (volume === undefined)
+      volume = .8;
 
-	// Some input has arrived, by voice or text
-	input: function(source, s) {
-		io.debugLog("Input received" + inParens(source) + ":" + inQuotes(s));
+    var aud = new Audio("audio/" + filename);
+    //aud.setVelocity(Math.random()),
+    aud.volume = Math.pow(app.sfxVolume * volume, 2);
+    aud.play();
+  },
 
-		app.pointer.handleInput(s);
-	},
+  output: function(s, onFinishEach, onFinish) {
 
-	debugLog: function(s) {
+    if (!Array.isArray(s)) {
+      if (!isString(s)) {
+        s = [s + ""];
+      } else {
+        s = s.split("\n");
+      }
+    }
 
-		io.logHolder.append("<div class='debug-line'>" + s + "<div/>");
-		// scroll to bottom
-		if (io.logHolder[0])
-			io.logHolder.scrollTop(io.logHolder[0].scrollHeight);
+    // remove any empty strings
+    s = s.filter(function(s2) {
+      return s2.trim().length > 0;
+    });
 
-	}
+    // for each section to say, add it to the queue 
+    // with handlers on what to do when its done outputting
+    for (var i = 0; i < s.length; i++) {
 
+      var s2 = {
+        data: s[i],
+      }
+      if (i < s.length - 1) {
+        s2.onFinish = onFinishEach;
+      } else {
+        if (onFinish)
+          s2.onFinish = function() {
+            onFinish();
+            if (onFinishEach)
+              onFinishEach();
+          }
+      }
+      io.outputQueue.push(s2);
+    }
+
+
+    io.attemptOutput();
+  },
+
+  attemptOutput: function() {
+
+    var section = io.outputQueue.shift();
+
+    if (section && !io.isOccupied) {
+
+      // Occupy this channel when in use
+      io.isOccupied = true;
+
+      // Callback on text if text-only
+
+      // Activate Chat with timer 
+      chat.say(0, section.data);
+
+      // on finish
+      function outputDone() {
+        if (section.onFinish)
+          section.onFinish();
+        io.isOccupied = false;
+        io.attemptOutput();
+      }
+
+      if (app.outputMode === "text") {
+        var readTime = Math.sqrt(section.data.length) * 50 + 200;
+        setTimeout(function() {
+          outputDone();
+        }, readTime);
+      } else {
+
+        io.textToSpeech(section.data, function() {
+          outputDone();
+        });
+      }
+
+      io.debugLog("Ouput" + inParens(io.outputMode) + ":" + inQuotes(section.data));
+    } else {
+      // push it back on the queue
+      if (section !== undefined)
+        io.outputQueue.unshift(section);
+    }
+  },
+
+  // Some input has arrived, by voice or text
+  input: function(source, s) {
+    io.debugLog("Input received" + inParens(source) + ":" + inQuotes(s));
+
+    app.pointer.handleInput(s);
+  },
+
+  debugLog: function(s) {
+
+    io.logHolder.append("<div class='debug-line'>" + s + "<div/>");
+    // scroll to bottom
+    if (io.logHolder[0]) {
+      io.logHolder.scrollTop(io.logHolder[0].scrollHeight);
+    }
+  }
 }

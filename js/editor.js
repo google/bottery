@@ -17,200 +17,186 @@ var mapSections = ["states", "initialBlackboard", "grammar"];
 
 function createEditorUI() {
 
-	// EDITOR
-	var editorHolder = $("#panel-editor .panel-content");
+  // EDITOR
+  var editorHolder = $("#panel-editor .panel-content");
 
-	var editPane = $("<div/>", {
-		class: "section"
-	}).appendTo(editorHolder).css({
-		height: "100%"
-	});
+  var editPane = $("<div/>", {
+    class: "section"
+  }).appendTo(editorHolder).css({
+    height: "100%"
+  });
 
-	var editBar = $("<div/>", {
-		class: "section-header",
-		id: "edit-controls"
-	}).appendTo(editPane);
+  var editBar = $("<div/>", {
+    class: "section-header",
+    id: "edit-controls"
+  }).appendTo(editPane);
 
-	var editContent = $("<div/>", {
-		class: "section-content",
-		id: "edit-json"
-	}).appendTo(editPane).css({
-		display: "flex",
-		flexDirection: "column"
-	});
+  var editContent = $("<div/>", {
+    class: "section-content",
+    id: "edit-json"
+  }).appendTo(editPane).css({
+    display: "flex",
+    flexDirection: "column"
+  });
 
-	mapSections.forEach(function(key) {
+  mapSections.forEach(function(key) {
 
-		var section = $("<div/>", {
-			class: "openable-section section",
-			id: "section-" + key,
-		}).appendTo(editContent).click(function() {
-			$(".openable-section").removeClass("open");
-			$(this).addClass("open");
-		});
+    var section = $("<div/>", {
+      class: "openable-section section",
+      id: "section-" + key,
+    }).appendTo(editContent).click(function() {
+      $(".openable-section").removeClass("open");
+      $(this).addClass("open");
+    });
 
-		var header = $("<div/>", {
-			class: "section-header",
-			html: key,
-			id: "edit-header-" + key
-		}).appendTo(section);
+    var header = $("<div/>", {
+      class: "section-header",
+      html: key,
+      id: "edit-header-" + key
+    }).appendTo(section);
 
-		var content = $("<div/>", {
-			class: "openable-section-content section-content",
-			contenteditable: true,
-			id: "edit-content-" + key,
-		}).appendTo(section).css({
+    var content = $("<div/>", {
+      class: "openable-section-content section-content",
+      contenteditable: true,
+      id: "edit-content-" + key,
+    }).appendTo(section).css({
 
-		}).on('blur keyup paste input focus', function() {
-			var obj = parseJSONSection($(this).text());
-			if (obj !== undefined) {
-				content.removeClass("error");
-				// reconstruct the raw map
+    }).on('blur keyup paste input focus', function() {
+      var obj = parseJSONSection($(this).text());
+      if (obj !== undefined) {
+        content.removeClass("error");
+        // reconstruct the raw map
+      } else {
+        content.addClass("error");
+      }
+    }).click(function() {
 
+    });
+  });
 
-			} else {
-				content.addClass("error");
-			}
-		}).click(function() {
+  $("#section-states").addClass("open");
 
-		});
+  var mapName = $("<div/>", {
+    id: "map-name",
+    contenteditable: true
+  }).appendTo(editBar);
 
-	});
+  var reloadButton = $("<button/>", {
+    html: "restart"
+  }).appendTo(editBar).click(function() {
+    // Create a map from this
+    app.loadMap(rebuildMap());
+  });
 
-	$("#section-states").addClass("open");
+  var copyAll = $("<button/>", {
+    html: "copy",
+  }).appendTo(editBar).click(function() {
+    var map = rebuildMap();
 
+    copyToClipboard(JSON.stringify(map, "null", 2));
+  });
 
+  var savebutton = $("<button/>", {
+    html: "save",
 
-	var mapName = $("<div/>", {
-		id: "map-name",
-		contenteditable: true
-	}).appendTo(editBar);
+  }).appendTo(editBar).click(function() {
+    save();
+  });
 
-	var reloadButton = $("<button/>", {
-		html: "restart"
-	}).appendTo(editBar).click(function() {
-		// Create a map from this 
+  // All savednames are prefixed with map_
+  var savedNames = [];
+  for (var i = 0, len = localStorage.length; i < len; ++i) {
+    var key = localStorage.key(i);
+    if (key.startsWith("map_"))
+      savedNames.push(key.substring(4));
+  }
 
-		app.loadMap(rebuildMap());
-	});
+  console.log("Saved found: " + savedNames);
 
-	var copyAll = $("<button/>", {
-		html: "copy",
-	}).appendTo(editBar).click(function() {
-		var map = rebuildMap();
+  controls.createDropdownControl("savedMap", savedNames, function(val) {
+    // load from storage
+    console.log("val:", val);
+    app.loadMapByID(val, true);
+    //  app.loadMap(JSON.parse(localStorage.getItem(val)), val.substring(4));
+  }, editBar)
 
-		copyToClipboard(JSON.stringify(map, "null", 2));
-	});
-
-	var savebutton = $("<button/>", {
-		html: "save",
-
-	}).appendTo(editBar).click(function() {
-		save();
-	});
-
-	// All savednames are prefixed with map_
-	var savedNames = [];
-	for (var i = 0, len = localStorage.length; i < len; ++i) {
-		var key = localStorage.key(i);
-		if (key.startsWith("map_"))
-			savedNames.push(key.substring(4));
-	}
-
-	console.log("Saved found: " + savedNames);
-
-	controls.createDropdownControl("savedMap", savedNames, function(val) {
-		// load from storage
-		console.log("val:", val);
-		app.loadMapByID(val, true);
-		//	app.loadMap(JSON.parse(localStorage.getItem(val)), val.substring(4));
-	}, editBar)
-
-	var output = $("<textarea/>", {
-		id: "output"
-	}).appendTo(editBar);
+  var output = $("<textarea/>", {
+    id: "output"
+  }).appendTo(editBar);
 }
 
 
 function editMap(map) {
-	// show the states, grammar, and 
-	for (var i = 0; i < mapSections.length; i++) {
-		var s = JSON.stringify(map[mapSections[i]], null, 2);
-		$("#edit-content-" + mapSections[i]).html("");
-		$("#edit-content-" + mapSections[i]).html(s);
-	}
+  // show the states, grammar, and 
+  for (var i = 0; i < mapSections.length; i++) {
+    var s = JSON.stringify(map[mapSections[i]], null, 2);
+    $("#edit-content-" + mapSections[i]).html("");
+    $("#edit-content-" + mapSections[i]).html(s);
+  }
 }
+
 
 function save() {
-	app.map.name = $("#map-name").text();
+  app.map.name = $("#map-name").text();
 
+  console.log("SAVING ", app.map.name);
 
-	console.log("SAVING ", app.map.name);
+  var toSave = JSON.stringify(rebuildMap(), "null", 2);
 
+  localStorage.setItem("map_" + app.map.name, toSave);
+  var found = localStorage.getItem("map_" + app.map.name);
 
-	var toSave = JSON.stringify(rebuildMap(), "null", 2);
-
-	localStorage.setItem("map_" + app.map.name, toSave);
-	var found = localStorage.getItem("map_" + app.map.name);
-
-
-	app.loadMap(JSON.parse(found));
-
-
+  app.loadMap(JSON.parse(found));
 }
-
 
 
 function rebuildMap() {
-	var newMap = {};
-	$.each(mapSections, function(index, key) {
-		var s = $("#edit-content-" + key).text();
-		var obj = parseJSONSection(s);
+  var newMap = {};
+  $.each(mapSections, function(index, key) {
+    var s = $("#edit-content-" + key).text();
+    var obj = parseJSONSection(s);
 
-		if (obj !== undefined) {
-			newMap[key] = obj;
-		} else {
-			console.log("current " + key + " section broken, use previous version");
-			newMap[key] = app.rawMap[key];
-		}
-
-	});
-	return newMap;
+    if (obj !== undefined) {
+      newMap[key] = obj;
+    } else {
+      console.log("current " + key + " section broken, use previous version");
+      newMap[key] = app.rawMap[key];
+    }
+  });
+  return newMap;
 }
 
 
 function parseJSONSection(json) {
 
-	if (json.trim().length === 0)
-		return {};
+  if (json.trim().length === 0)
+    return {};
 
-	var parsed;
+  var parsed;
 
-	try {
-		parsed = JSON.parse(json)
-	} catch (ev) {
-		return undefined;
-		// ignore 
-	}
+  try {
+    parsed = JSON.parse(json)
+  } catch (ev) {
+    return undefined;
+    // ignore 
+  }
 
-	return parsed;
+  return parsed;
 }
 
+
 function copyToClipboard(text) {
+  var target = $("#output");
 
+  target.val(text);
+  target.select();
+  target.focus();
 
-	var target = $("#output");
-
-	target.val(text);
-	target.select();
-	target.focus();
-
-
-	try {
-		var successful = document.execCommand('copy');
-		var msg = successful ? 'successful' : 'unsuccessful';
-		console.log('Copying text command was ' + msg);
-	} catch (err) {
-		console.log('Oops, unable to copy');
-	}
+  try {
+    var successful = document.execCommand('copy');
+    var msg = successful ? 'successful' : 'unsuccessful';
+    console.log('Copying text command was ' + msg);
+  } catch (err) {
+    console.log('Oops, unable to copy');
+  }
 }
