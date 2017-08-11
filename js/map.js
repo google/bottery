@@ -413,7 +413,7 @@ function parseMapTarget(raw) {
   return parsed;
 }
 
-
+// Parse a whole state definition
 function parseState(raw, key) {
   var parsed = {
     raw: JSON.stringify(raw),
@@ -425,6 +425,7 @@ function parseState(raw, key) {
     onExit: []
   };
 
+// Suggestion chips for this state
   if (raw.chips)
     parsed.chips = raw.chips;
 
@@ -579,6 +580,7 @@ function parseExit(raw) {
 
         parsed.actions = rawActions.map(parseMapAction);
         parsed.conditions = rawConditions.map(parseMapCondition);
+
         // remove conditions from priority and move to its own thing
         parsed.conditions = parsed.conditions.filter(function(cond) {
           if (cond.target === "priority") {
@@ -618,6 +620,13 @@ function parseMap(raw) {
     });
   }
 
+
+  if (raw.exits) {
+    if (!Array.isArray(raw.exits))
+      raw.exits = [raw.exits];
+   parsed.exits = raw.exits.map(exit => parseExit(exit));
+   
+  }
   return parsed;
 }
 

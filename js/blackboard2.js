@@ -322,6 +322,10 @@ function createBasicFunctions() {
       var path = parseMapPath(pathRaw);
       pointer.set(path, g);
 
+    },
+
+    'if': function(condition, effect) {
+      console.log('IFFFFFFFFFFF?!?!?!?!?!?!?!??!?')
     }
   };
 

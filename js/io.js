@@ -51,7 +51,7 @@ var io = {
 
   textToSpeech: function(text, onFinish, onFinishEach) {
 
-    var hollyPrefix = "https://voice-search-prod.sandbox.google.com/synthesize?sky=rad_b924-18a3-c08b-451c&client=webpatts&lang=en-us&engine=Phonetic+Arts&name=" + voices[app.voice] + "&enc=mpeg&speed=" + app.voiceSpeed.toFixed(2) + "&text=";
+    console.log("Speaking: " + text);
     if (!Array.isArray(text)) {
       text = [text];
     }
@@ -60,15 +60,8 @@ var io = {
     function iterate() {
       var singleText = text[index];
 
-      // Using an audio object
-      var aud = new Audio(hollyPrefix + singleText);
-
       var msg = new SpeechSynthesisUtterance(singleText);
       window.speechSynthesis.speak(msg);
-      /*
-      aud.play();
-      aud.volume = Math.pow(app.voiceVolume, 2);
-       */
 
       // Interrupting a current voice output?
       if (app.speaking)
@@ -100,7 +93,6 @@ var io = {
       msg.onend = finish;
 
       // Allow finishing events with either event end, or timeout (for broken audio)
-      aud.addEventListener("ended", finish);
       setTimeout(finish, singleText.length * 100 + 100);
 
     }
@@ -158,6 +150,8 @@ var io = {
     io.attemptOutput();
   },
 
+  // Gets queued text and outputs it.
+  // This is called recursively
   attemptOutput: function() {
 
     var section = io.outputQueue.shift();
@@ -186,7 +180,7 @@ var io = {
           outputDone();
         }, readTime);
       } else {
-
+// ** both text+speech & speech should trigger this??
         io.textToSpeech(section.data, function() {
           outputDone();
         });
