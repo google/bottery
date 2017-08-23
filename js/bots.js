@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Trivia game noodle
-
-
-// Create a stateMap
-
-//var kittens_v =  require(['./kittens.json']);
-//var toast_v =  require(['./toast.json']);
+// Load bots for demo
 
 function loadBot(name, map) {
   console.log("loading " + name);
@@ -28,8 +22,7 @@ function loadBot(name, map) {
   });  
   req.done(function(data) {
     console.log("Bot '" + name + "' loaded successfully");
-    eval(data);
-    map[name] = bot;
+    map[name] = eval(data);
   });
   req.fail(function( jqXHR, textStatus ) {
     console.log("Bot '" + name + "' could not be loaded: " + textStatus );
@@ -55,6 +48,4 @@ var bots = [
 for (var i = 0; i < bots.length; i++) {
   loadBot(bots[i], testMaps);
 }
-
-
 
