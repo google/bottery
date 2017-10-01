@@ -13,14 +13,17 @@ bot = {
     },
 
     q_start: {
-      exits: ["count<qCount ->q_ask", "->calculateScore"],
+      exits: ["(count<qCount) ->q_ask", "->calculateScore"],
     },
 
     // Compare two things
     q_ask: {
       onEnter: "count++ q0=select(themes) q1=select(themes)",
       onEnterSay: ["#question#"],
-      exits: ["'one' ->q_start '#/q0#++' scores[q0]++", "'two' ->q_start '#/q1#++' scores[q1]++"]
+      exits: [
+        "'one' ->q_start '#/q0#++' scores[q0]++",
+        "'two' ->q_start '#/q1#++' scores[q1]++"
+      ]
     },
 
     // Find the two highest scores

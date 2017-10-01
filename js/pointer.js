@@ -439,9 +439,6 @@ function updateExit(exitAnalysis, pointer) {
 
 
   viz.setClassesIf(exitAnalysis.template, "open", exitAnalysis.isOpen);
-
-
-
 }
 
 function updateCondition(conditionAnalysis, pointer) {

@@ -17,7 +17,12 @@ bot = {
 
     predict: {
       chips: ["heads", "tails"],
-      exits: ["'heads' ->doFlip prediction='heads'", "'tails' ->doFlip prediction='tails'", "'*' ->askForClarification", "wait:10 ->whineAtPlayer"],
+      exits: [
+        "'heads' ->doFlip prediction='heads'", 
+        "'tails' ->doFlip prediction='tails'", 
+        "'*' ->askForClarification", 
+        "wait:10 ->whineAtPlayer"
+      ],
     },
 
     whineAtPlayer: {

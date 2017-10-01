@@ -151,6 +151,8 @@ function save() {
 
 
 function rebuildMap() {
+  console.log("REBUILD")
+  
   var newMap = {};
   $.each(mapSections, function(index, key) {
     var s = $("#edit-content-" + key).text();
@@ -163,7 +165,9 @@ function rebuildMap() {
       newMap[key] = app.rawMap[key];
     }
   });
+
   return newMap;
+  
 }
 
 

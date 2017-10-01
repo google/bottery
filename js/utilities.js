@@ -140,6 +140,3 @@ var Panel = Class.extend({
     });
   }
 });
-
-
-

@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+// Default map id
+var defaultMapID = "tesla";
+
 var app = {
   start: Date.now(),
   autoprogress: false,
@@ -56,7 +60,7 @@ var app = {
 
     if (!raw) {
       console.log(inQuotes(id) + " not found");
-      id = "lostTesla";
+      id = defaultMapID;
       raw = testMaps[id];
     }
 
@@ -73,7 +77,7 @@ var app = {
   },
 
   loadMap: function(raw, id) {
-
+   console.log("LOAD " + id)
     if (!raw.settings)
       raw.settings = {
         id: id
@@ -107,7 +111,8 @@ var app = {
         app.pointer.updateView();
         inspector.inspect(app.map);
     */
-  }
+  
+}
 
 };
 var mapCount = 0;
@@ -115,10 +120,10 @@ var updateSpeed = 20;
 
 $(document).ready(function() {
   new Panel("viz", {
-    x: 0,
-    y: 520,
+    x: 1200,
+    y: 10,
     w: 320,
-    h: 128,
+    h: 320,
   });
 
   new Panel("controls", {
@@ -155,8 +160,8 @@ $(document).ready(function() {
   });
 
   new Panel("stateview", {
-    x: 900,
-    y: 10,
+    x: 1200,
+    y: 340,
     w: 200,
     h: 200,
   });
