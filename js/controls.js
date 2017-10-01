@@ -12,21 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var voices = {
-  aussieLady: "afh",
-  indianLady: "ahp",
-  chillIndianLady: "cxx",
-  britDude: "rjs",
-  lightDude: "sfg-vocoded%23male_1",
-  mellowDude: "sfg-vocoded%23male_3",
-  mrGameshow: "tpb-vocoded",
-  chillLady: "tpc-vocoded",
-
-  unchillBritLady: "fis",
-
-  holly: "hol",
-}
-
 
 function clearDataWithPrefix(prefix) {
   for (var i = 0, len = localStorage.length; i < len; ++i) {
@@ -49,18 +34,14 @@ var controls = {
       class: "control-holder"
     }).appendTo($("#panel-controls .panel-content"));
 
-
     this.createRadioControl("outputMode", ["text", "speech", "both"]);
 
-    this.createDropdownControl("voice", Object.keys(voices));
     this.createDropdownControl("mapName", Object.keys(testMaps), function(mapName) {
       console.log("load map " + mapName);
       app.loadMapByID(mapName, false);
     });
 
     var div = $("<div/>").appendTo(this.holder);
-    this.createSliderControl("voiceVolume", 0, 1, .05, div)
-    this.createSliderControl("voiceSpeed", 0, 1, .05, div);
     this.createSliderControl("updateSpeed", 0, 1, .05, div);
     this.createSliderControl("exitPause", 0, 1, .05, div);
 
@@ -69,7 +50,6 @@ var controls = {
     var buttonDiv = $("<div/>").appendTo(this.holder);
 
     this.createToggleButton("pause", buttonDiv);
-    this.createToggleButton("autoplay", buttonDiv);
 
     this.clearPos = $("<button/>", {
       html: "clear panel positions"
