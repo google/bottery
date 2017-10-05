@@ -19,14 +19,16 @@ The goal of Bottery is to help *everyone*, from designers to writers to coders, 
 Users in Tracery write **grammars**, JSON objects that recursively define how to generate some text, like [the musings of a lost self-driving car](http://cheapbotsdonequick.com/source/losttesla) or [outer-space adventures](http://cheapbotsdonequick.com/source/tinyadv).  Tracery grammars are lists of symbol names (like "animal") and their expansion rules (like "emu, okapi, pangolin").
 
 In Bottery, users write **maps**.  Each map is composed of four sub-components
-* a set of states, with information about what to do on entering them, and how to get from one to another
-* a set of initial blackboard values
-* an optional Tracery grammar
-* optional settings, like what voice should be used for TTS
+* A set of states, with information about what to do on entering them, and how to get from one to another
+* A set of initial blackboard values
+* An optional Tracery grammar
+* Optional settings, like what voice should be used for TTS
 
 ### Blackboard (and the pointer)
 
 You can imagine a Bottery map like a [boardgame board](https://www.google.com/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&ved=0ahUKEwibnLuC-JDSAhVRyWMKHZQNB3cQjRwIBw&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2F361273201334614541%2F&psig=AFQjCNGOTBu2PiFkWuV4zs2eeF-mL0PP-Q&ust=1487208084344985): there are spaces, and connections between the spaces, and rules for how to move between them.  The map itself doesn't change or store information during play.  Instead, you have a pointer showing whch space you're on, and maybe some information stored in that pointer (like the number of kids in your Game of Life car).  There's a pointer in Bottery that stores your position in the map (the current **state**), and it also has a Blackboard object, an object that can store and retrieve information.  An RPG map might use the blackboard to store the number of hitpoints for the main character, their current weapon and its stats, their gold, and quest progress.  A quiz bot might store all of its categories, questions and answers, the players' current points, and which questions it wants to ask next.  You can store strings, booleans, numbers, hierarchical objects, and arrays in the blackboard.  Storing and retrieving information is done with a JS-like syntax: "foo.bar[5]" gets the value at the 5th index of object "bar" in object "foo".  "foo.baz[10][20] = 10" behaves similarly, though unlike JS, if these parameters don't exist, it will create new objects or arrays and fill them rather than throwing an error. See `parseMapPath` in `map.js` for details.
+
+Variables in the blackboard can be accessed from within Tracery with the syntax `You have guessed #/guessCount# times.`
 
 ### States
 
@@ -127,5 +129,227 @@ This is a representation of the current state of the bot, and the potential next
 
 Displays the directed connectivity graph of states and exits. Highlights the current state and any active exit transitions.
 
+## Example bot (kitten simulator!)
 
+Now that we have reviewed the underlying concepts and the interface, it is time to build a bot!
+
+When you have checked out the git repository, create a new file `kittens.js` in the `bots` directory, and add `kittens` to the list of bots in `bots.js`.
+
+We can start with the following in `kittens.js`:
+
+`
+bot = {
+  states: {
+    origin: {
+      onEnter: "'You have a kitten!'",
+    },
+  },
+}
+`
+
+This is a minimal valid bot. It has one state, the `origin`, and that has a single `onEnter` associated with it. Note the fact that the text `'You have a kitten!'` is in single quotes. This is an output action and denotes that this string is to be output as text. We will add additional actions later.
+
+A note on syntax: The format of this is valid javascript, and is very similar to JSON, but is not valid JSON because of two key differences: trailing commas are permitted, and object keys do not require quotes.
+
+### Interactive kitten
+
+A bot isn't very interesting until you can interact with it, so let's add some interactivity:
+
+`
+bot = {
+  states: {
+    origin: {
+      onEnter: "'You have a kitten!'",
+      exits: "->name",
+    },
+    name: {
+      onEnter: "'What do you want to name your kitten?'",
+      exits: "'*' ->respondToName name=INPUT",
+    },
+    respondToName: {
+      onEnterSay: "The kitten purrs happily, I guess it likes the name #/name#!",
+    },
+  },
+}
+`
+
+This example introduces two new states: `name` and `respondToName`. These states are connected via `exits`. The exit on `origin` has no conditions, and therefore is entered immedately by the Pointer. The exit in the state `name` requies some form of user input indicated by the asterisk. This exit has an action associated with it in the form `name=INPUT`. `INPUT` is a special variable indicating the user's input. `name=INPUT` has the effect that the variable `name` is assigned to what the user entered, and is saved in the blackboard. In state `respondToName` there is an `onEnterSay` behavior, which is similar to `onEnter`, but does not require extra single quotes around the text outputted. The blackboard variable `name` is accessed via Tracery syntax using `#/name#`.
+
+Interacting with this bot, you can see that the **viz** view displays the state graph, and the blackboard view displays the user-entered name.
+
+***** SCREEN SHOT
+
+### Suggestion chips
+
+User interactions can be expediated though the use of suggestion chips. These are prompts that are shown to the user when interacting through text. 
+
+`
+bot = {
+  states: {
+    origin: {
+      onEnter: "'You have a kitten!'",
+      exits: "->name",
+    },
+    name: {
+      onEnter: "'What do you want to name your kitten?'",
+      chips: ["Cupcake", "Dark Lord Satan"],
+      exits: "'*' ->respond_to_name name=INPUT",
+    },
+    respond_to_name: {
+      onEnterSay: "The kitten purrs happily, I guess it likes the name #/name#!",
+    },
+  },
+}
+`
+
+### Adding Tracery grammar
+
+A little more flavor can be added using a Tracery grammar:
+
+`
+bot = {
+  grammar: {
+    noun: ["cat", "monkey","butter", "pants", "demon", "fluff", "taco", "mountain", "butt"],
+    adj: ["fluffy", "fat", "puff", "tepid", "love", "unruly"],
+    name: ["#noun.capitalize##noun#", "#adj.capitalize##noun#", "#noun.capitalize# the #adj.capitalize#"],
+  },
+  states: {
+    origin: {
+      onEnter: "'You have a kitten!'",
+      exits: "->name",
+    },
+    name: {
+      onEnter: "'What do you want to name your kitten?'",
+      chips: ["#name#", "#name#", "Cupcake", "Dark Lord Satan"],
+      exits: "'*' ->respond_to_name name=INPUT",
+    },
+    respond_to_name: {
+      onEnterSay: "The kitten purrs happily, I guess it likes the name #/name#!",
+    },
+  },
+}
+`
+
+***** SCREEN SHOT
+
+### Petting the kitten
+
+What are some of the things that a user might want to do with a kitten bot? A natural thing to do would be to pet the kitten. Real life kittens are temperamental creatures, and can behave unpredictably. We can use the blackboard to store a variable indicating the number of times the kitten wants to be petted, and anything beyond that will cause the kitten to bite the user.
+
+`
+bot = {
+  grammar: {
+    noun: ["cat", "monkey","butter", "pants", "demon", "fluff", "taco", "mountain", "butt"],
+    adj: ["fluffy", "fat", "puff", "tepid", "love", "unruly"],
+    name: ["#noun.capitalize##noun#", "#adj.capitalize##noun#", "#noun.capitalize# the #adj.capitalize#"],
+  },
+  states: {
+    origin: {
+      onEnter: "'You have a kitten!' desired_pets=randomInt(1,5)",
+      exits: "->name",
+    },
+    name: {
+      onEnter: "'What do you want to name your kitten?'",
+      chips: ["#name#", "#name#", "Cupcake", "Dark Lord Satan"],
+      exits: "'*' ->respond_to_name name=INPUT",
+    },
+    respond_to_name: {
+      onEnterSay: "The kitten purrs happily, I guess it likes the name #/name#!",
+    },
+    pet: {
+      onEnter: "'You pet the kitten' desired_pets--",
+      exits: ["desired_pets>=0 ->happy_pet", "->angry_pet"]
+    },
+    happy_pet: {
+      onEnterSay: "#/name# loves you and is in ecstacy",
+    },
+    angry_pet: {
+      onEnterSay: "why did you pet #/name# when it didn't want to be petted!?",
+      onEnter: "desired_pets=randomInt(1,5)",
+    }
+  },
+  exits: "'pet' ->pet",
+  initialBlackboard: {
+    name: "the kitten",
+  },
+}
+`
+
+This example adds a global exit. No matter where the Pointer is at on the graph, the user can always pet the kitten. This introduces a problem, though, because the user could potentially pet the kitten before it was named, so an initial value for the name is configured in the blackboard. When the origin is entered, the variable `desired_pets` is set to a random value between 1 and 5. When the user pets the kitten too much, the `angry_pet` node is entered. 
+
+**** SCREEN SHOT
+
+### State flow
+
+Finally, we should add some idle behavior for the kitten when it is not being petted.
+
+`
+bot = {
+  grammar: {
+    noun: ["cat", "monkey","butter", "pants", "demon", "fluff", "taco", "mountain", "butt"],
+    adj: ["fluffy", "fat", "puff", "tepid", "love", "unruly"],
+    name: ["#noun.capitalize##noun#", "#adj.capitalize##noun#", "#noun.capitalize# the #adj.capitalize#"],
+    catSpeak: ["mmrrr", "meow", "mmrrrrow", "meep", "#catSpeak# #catSpeak#"],
+  },
+  states: {
+    origin: {
+      onEnter: "'You have a kitten!' desired_pets=randomInt(1,5)",
+      exits: "->name",
+    },
+    name: {
+      onEnter: "'What do you want to name your kitten?'",
+      chips: ["#name#", "#name#", "Cupcake", "Dark Lord Satan"],
+      exits: "'*' ->respond_to_name name=INPUT",
+    },
+    respond_to_name: {
+      onEnterSay: "The kitten purrs happily, I guess it likes the name #/name#!",
+      exits: "->idle"
+    },
+    pet: {
+      onEnter: "'You pet the kitten' desired_pets--",
+      exits: ["desired_pets>=0 ->happy_pet", "->angry_pet"]
+    },
+    happy_pet: {
+      onEnterSay: "#/name# loves you and is in ecstacy",
+      exits: "wait:10 ->idle"
+    },
+    angry_pet: {
+      onEnterSay: "why did you pet #/name# when it didn't want to be petted!?",
+      onEnter: "desired_pets=randomInt(1,5)",
+      exits: "->angry"
+    },
+    idle: {
+      onEnterSay: "#/name# rolls around and makes cute noises",
+      exits: "wait:10 ->hungry",
+    },
+    angry: {
+      onEnter: "'The kitten is angry! *bite*'",
+      exits: "wait:10 ->sleeping",
+    },
+    sleeping: {
+      onEnter: "'The kitten is sleeping! zzzzzzzzz'",
+      exits: "wait:10 ->hungry",
+    },
+    hungry: {
+      onEnter: "'The kitten is hungry! meow meow #catSpeak#'",
+      exits: "wait:10 ->angry",
+    },
+  },
+  exits: "'pet' ->pet",
+  initialBlackboard: {
+    name: "the kitten",
+  },
+}
+`
+
+This final example adds state transitions that form a cycle of activity. If no interaction occurs, the kitten will naturally cycle between the states of `hungry`, `sleeping`, and `angry`. The `wait:10` condition on the exit will delay for a particular amount of time before automatically advancing into that state. 
+
+**** SCREENSHOT
+
+### Additional resources.
+
+This concludes the tutorial. For more examples of types of bots, check out:
+* `amIPsychic.js` This is a simple guessing game where the user guesses whether a random coin will flip heads or tails. The bot tracks the longest winning and losing streak.
+* `quiz.js` A basic quiz game where the user answers questions and these are used to determine a Hip Hop DJ name.
+* `tesla.js` A bot based on the tracery [twitter bot](https://twitter.com/losttesla) of the same name.
 

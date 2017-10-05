@@ -325,7 +325,7 @@ function createBasicFunctions() {
     },
 
     'if': function(condition, effect) {
-      console.log('IFFFFFFFFFFF?!?!?!?!?!?!?!??!?')
+      console.log('IF')
     }
   };
 

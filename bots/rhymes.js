@@ -24,7 +24,6 @@ bot = {
       ays: ["How do I love #noun#s? Let me count the ways", "I'll love #noun#s for all my days"],
       ad: ["I remember a #noun# I had", "A #adj# #noun# would be rad", "#noun#s will never make me sad", "A #noun# can always make me glad"],
       ee: ["A #noun# is lovely as a tree", "I'm not as #adj# as #noun.a# would be"],
-
     },
 
   },

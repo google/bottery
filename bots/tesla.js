@@ -11,8 +11,6 @@ bot = {
         //  ask: "input:(where are you) ->update"
     },
 
-
-
     setRadio: {
       onEnterSay: "#activateRadio#\n",
       exits: ["wait:2 ->radioStation"]

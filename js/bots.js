@@ -36,6 +36,7 @@ var bots = [
   "besties",
   "emotionFlow",
   "kittens",
+  "kittens1",
   "maraudersMap",
   "petSim",
   "quiz",
