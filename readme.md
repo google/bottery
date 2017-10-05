@@ -97,7 +97,7 @@ When the pointer uses an exit, the following occurs:
 
 ## Interface Overview
 
-![UI overview](doc_images/bottery_ui.png)
+![UI overview](doc_images/bottery_ui.png?raw=true)
 
 ### Chat
 
@@ -178,7 +178,7 @@ This example introduces two new states: `name` and `respondToName`. These states
 
 Interacting with this bot, you can see that the **viz** view displays the state graph, and the blackboard view displays the user-entered name.
 
-![](doc_images/kittens1.png)
+![](doc_images/kittens1.png?raw=true)
 
 ### Suggestion chips
 
@@ -231,7 +231,7 @@ bot = {
 }
 ```
 
-![](doc_images/kittens2.png)
+![](doc_images/kittens2.png?raw=true)
 
 ### Petting the kitten
 
@@ -278,7 +278,7 @@ bot = {
 
 This example adds a global exit. No matter where the Pointer is at on the graph, the user can always pet the kitten. This introduces a problem, though, because the user could potentially pet the kitten before it was named, so an initial value for the name is configured in the blackboard. When the origin is entered, the variable `desired_pets` is set to a random value between 1 and 5. When the user pets the kitten too much, the `angry_pet` node is entered. 
 
-![](doc_images/kittens3.png)
+![](doc_images/kittens3.png?raw=true)
 
 ### State flow
 
@@ -345,7 +345,7 @@ bot = {
 
 This final example adds state transitions that form a cycle of activity. If no interaction occurs, the kitten will naturally cycle between the states of `hungry`, `sleeping`, and `angry`. The `wait:10` condition on the exit will delay for a particular amount of time before automatically advancing into that state. 
 
-![](doc_images/kittens4.png)
+![](doc_images/kittens4.png?raw=true)
 
 ### Additional resources.
 
