@@ -7,34 +7,35 @@
 
 Bottery is a syntax, editor, and simulator for prototyping **generative contextual conversations** modeled as **finite state machines**
 
-Bottery takes inspiration from the Tracery opensource project for generative text (also by katecompton@ in a non-google capacity) and the CheapBotsDoneQuick bot-hosting platform, as well as open FSM-based storytelling tools like Twine.  
+Bottery takes inspiration from the **[Tracery](http://tracery.io/)** opensource project for generative text (also by katecompton@ in a non-google capacity) and the CheapBotsDoneQuick bot-hosting platform, as well as open FSM-based storytelling tools like Twine.  
 
 Like Tracery, Bottery is a *syntax* that specifies the script of a conversation (a *map*) with JSON.  Like CheapBotsDoneQuick, the BotteryStudio can take that JSON and run a simulation of that conversation in a nice Javascript front-end, with helpful visualizations and editting ability.
 
 The goal of Bottery is to help *everyone*, from designers to writers to coders, be able to write simple and engaging  contextual conversational agents, and to test them out in a realistic interactive simulation, mimicking how they'd work on a "real" platform like API.AI.  
 
 
-## Maps
+## Bottry concepts
 
 Users in Tracery write **grammars**, JSON objects that recursively define how to generate some text, like [the musings of a lost self-driving car](http://cheapbotsdonequick.com/source/losttesla) or [outer-space adventures](http://cheapbotsdonequick.com/source/tinyadv).  Tracery grammars are lists of symbol names (like "animal") and their expansion rules (like "emu, okapi, pangolin").
 
-In Bottery, users write **maps**.  Each map is composed of four sub-components
-* A set of states, with information about what to do on entering them, and how to get from one to another
-* A set of initial blackboard values
-* An optional Tracery grammar
-* Optional settings, like what voice should be used for TTS
+In Bottery, users write **maps**. Each map is composed of four sub-components
+* A set of **states**, with information about what to do on entering them, and how to get from one to another
+* A set of initial **blackboard** values
+* An optional Tracery **grammar**
 
 ### Blackboard (and the pointer)
 
-You can imagine a Bottery map like a [boardgame board](https://www.google.com/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&ved=0ahUKEwibnLuC-JDSAhVRyWMKHZQNB3cQjRwIBw&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2F361273201334614541%2F&psig=AFQjCNGOTBu2PiFkWuV4zs2eeF-mL0PP-Q&ust=1487208084344985): there are spaces, and connections between the spaces, and rules for how to move between them.  The map itself doesn't change or store information during play.  Instead, you have a pointer showing whch space you're on, and maybe some information stored in that pointer (like the number of kids in your Game of Life car).  There's a pointer in Bottery that stores your position in the map (the current **state**), and it also has a Blackboard object, an object that can store and retrieve information.  An RPG map might use the blackboard to store the number of hitpoints for the main character, their current weapon and its stats, their gold, and quest progress.  A quiz bot might store all of its categories, questions and answers, the players' current points, and which questions it wants to ask next.  You can store strings, booleans, numbers, hierarchical objects, and arrays in the blackboard.  Storing and retrieving information is done with a JS-like syntax: "foo.bar[5]" gets the value at the 5th index of object "bar" in object "foo".  "foo.baz[10][20] = 10" behaves similarly, though unlike JS, if these parameters don't exist, it will create new objects or arrays and fill them rather than throwing an error. See `parseMapPath` in `map.js` for details.
+You can imagine a Bottery map like a finite state machine or a [boardgame board](https://www.google.com/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&ved=0ahUKEwibnLuC-JDSAhVRyWMKHZQNB3cQjRwIBw&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2F361273201334614541%2F&psig=AFQjCNGOTBu2PiFkWuV4zs2eeF-mL0PP-Q&ust=1487208084344985): there are spaces, and connections between the spaces, and rules for how to move between them.  The map itself doesn't change or store information during play.  Instead, you have a **pointer** showing whch state you are on, all the variables in the blackboard (like the number of kids in your Game of Life car).
+
+An RPG map might use the blackboard to store the number of hit points for the main character, their current weapon and its stats, their gold, and quest progress.  A quiz bot might store all of its categories, questions and answers, the players' current points, and which questions it wants to ask next.  You can store strings, booleans, numbers, hierarchical objects, and arrays in the blackboard.  Storing and retrieving information is done with a Javascript-like syntax: `foo.bar[5]` gets the value at the 5th index of object `bar` in object `foo`.  `foo.baz[10][20] = 10` behaves similarly, though unlike Javascript, if these parameters don't exist, it will create new objects or arrays and fill them rather than throwing an error. See `parseMapPath` in `map.js` for details.
 
 Variables in the blackboard can be accessed from within Tracery with the syntax `You have guessed #/guessCount# times.`
 
 ### States
 
 Each state is a node in the Bottery map. A state has
-* An id
-* A list of actions to be taken when the state is entered
+* An **id**
+* A list of **actions** to be taken when the state is entered
 * A dictionary of **exits** to other states.
 * Optionally, a list of **suggestion chips** (using tracery syntax) of suggested user inputs. This is commonly used in text based bots.
 
@@ -45,20 +46,20 @@ There are several ways to express the actions that are taken when the state is e
 * `onEnterPlay` Plays the audio file specified.
 * `onEnterFxn` Executes the given function (but must be defined in `map.js`)
 
-All bots must have an `origin` state, which is the first state entered when the map is run.
+All bots must have an `origin` state, which is the first state entered when the bot starts.
 
 ### Exits
 
-Exits are desscribed by strings in the format:
+Exits are described by strings in the format:
 `[conditions] ->TARGET_NAME [actions to take when taken]`
 
 Syntax for actions and conditions are described below.
 
 If all the conditions are true then the exit becomes active. If there are *no* conditions, the exit is always active.
 
-Then there is an arrow (`->`) and a target.  The target is either an **id of a state** or an at sign `@` that indicates the Pointer should re-enter the current state.
+Then there is an arrow (`->`) and a target.  The target is either an **id of a state** or an at sign `@` that indicates the pointer should re-enter the current state.
 
-The list of actions is in Action Syntax (see below).
+The list of actions is in **action syntax** (see below).
 
 ### Condition
 
@@ -75,14 +76,14 @@ Action syntax is similar to condition syntax:
 * Play sound: `playSound([sound name])`
 * Incrementation: Increments or decrements a variable in the blackboard. E.g.:`[varName]++` or `[varName]--`
 
-### How the Pointer decides how to move
+### How the pointer decides how to move
 
 When the pointer enters a state, the following things happen:
 1. Any `onEnter` actions are executed.
 2. Any **suggestion chips** are created and displayed to the user.
 3. All available exits (including the exits specified in the state, as well as global exits) are collected.
 
-The Pointer then waits for state change. At the moment, state change includes user input, and the passage of time. If no `wait` conditions are present, then the bot will wait for user input forever. When that state change occurs, the Pointer will re-evaluate all the conditions on the currently available exits. If all the conditions on an exit evaluate to true, then that exit becomes active.
+The pointer then waits for state change. At the moment, state change includes user input, and the passage of time. If no `wait` conditions are present, then the bot will wait for user input forever. When that state change occurs, the pointer will re-evaluate all the conditions on the currently available exits. If all the conditions on an exit evaluate to true, then that exit becomes active.
 
 It is often the case that multiple exits are active at the same time. For example:
 `"yes" ->startGame`
@@ -90,13 +91,13 @@ It is often the case that multiple exits are active at the same time. For exampl
 
 If the user types "yes", both exits are active. The first exit in in the list of active exits is selected. In this case `"yes" ->startGame` will be chosen.
 
-When the Pointer uses an exit, the following occurs:
+When the pointer uses an exit, the following occurs:
 1. The actions associated with the exit are executed.
 2. The pointer moves to the state of that exit and the process begins anew.
 
 ## Interface Overview
 
-Review of UI elements
+![UI overview](doc_images/bottery_ui.png)
 
 ### Chat
 
@@ -137,7 +138,7 @@ When you have checked out the git repository, create a new file `kittens.js` in 
 
 We can start with the following in `kittens.js`:
 
-`
+```javascript
 bot = {
   states: {
     origin: {
@@ -145,7 +146,7 @@ bot = {
     },
   },
 }
-`
+```
 
 This is a minimal valid bot. It has one state, the `origin`, and that has a single `onEnter` associated with it. Note the fact that the text `'You have a kitten!'` is in single quotes. This is an output action and denotes that this string is to be output as text. We will add additional actions later.
 
@@ -155,7 +156,7 @@ A note on syntax: The format of this is valid javascript, and is very similar to
 
 A bot isn't very interesting until you can interact with it, so let's add some interactivity:
 
-`
+```javascript
 bot = {
   states: {
     origin: {
@@ -171,19 +172,19 @@ bot = {
     },
   },
 }
-`
+```
 
 This example introduces two new states: `name` and `respondToName`. These states are connected via `exits`. The exit on `origin` has no conditions, and therefore is entered immedately by the Pointer. The exit in the state `name` requies some form of user input indicated by the asterisk. This exit has an action associated with it in the form `name=INPUT`. `INPUT` is a special variable indicating the user's input. `name=INPUT` has the effect that the variable `name` is assigned to what the user entered, and is saved in the blackboard. In state `respondToName` there is an `onEnterSay` behavior, which is similar to `onEnter`, but does not require extra single quotes around the text outputted. The blackboard variable `name` is accessed via Tracery syntax using `#/name#`.
 
 Interacting with this bot, you can see that the **viz** view displays the state graph, and the blackboard view displays the user-entered name.
 
-***** SCREEN SHOT
+![UI overview](doc_images/kittens1.png)
 
 ### Suggestion chips
 
 User interactions can be expediated though the use of suggestion chips. These are prompts that are shown to the user when interacting through text. 
 
-`
+```javascript
 bot = {
   states: {
     origin: {
@@ -200,13 +201,13 @@ bot = {
     },
   },
 }
-`
+```
 
 ### Adding Tracery grammar
 
 A little more flavor can be added using a Tracery grammar:
 
-`
+```javascript
 bot = {
   grammar: {
     noun: ["cat", "monkey","butter", "pants", "demon", "fluff", "taco", "mountain", "butt"],
@@ -228,15 +229,15 @@ bot = {
     },
   },
 }
-`
+```
 
-***** SCREEN SHOT
+![UI overview](doc_images/kittens2.png)
 
 ### Petting the kitten
 
 What are some of the things that a user might want to do with a kitten bot? A natural thing to do would be to pet the kitten. Real life kittens are temperamental creatures, and can behave unpredictably. We can use the blackboard to store a variable indicating the number of times the kitten wants to be petted, and anything beyond that will cause the kitten to bite the user.
 
-`
+```javascript
 bot = {
   grammar: {
     noun: ["cat", "monkey","butter", "pants", "demon", "fluff", "taco", "mountain", "butt"],
@@ -273,17 +274,17 @@ bot = {
     name: "the kitten",
   },
 }
-`
+```
 
 This example adds a global exit. No matter where the Pointer is at on the graph, the user can always pet the kitten. This introduces a problem, though, because the user could potentially pet the kitten before it was named, so an initial value for the name is configured in the blackboard. When the origin is entered, the variable `desired_pets` is set to a random value between 1 and 5. When the user pets the kitten too much, the `angry_pet` node is entered. 
 
-**** SCREEN SHOT
+![UI overview](doc_images/kittens3.png)
 
 ### State flow
 
 Finally, we should add some idle behavior for the kitten when it is not being petted.
 
-`
+```javascript
 bot = {
   grammar: {
     noun: ["cat", "monkey","butter", "pants", "demon", "fluff", "taco", "mountain", "butt"],
@@ -340,11 +341,11 @@ bot = {
     name: "the kitten",
   },
 }
-`
+```
 
 This final example adds state transitions that form a cycle of activity. If no interaction occurs, the kitten will naturally cycle between the states of `hungry`, `sleeping`, and `angry`. The `wait:10` condition on the exit will delay for a particular amount of time before automatically advancing into that state. 
 
-**** SCREENSHOT
+![UI overview](doc_images/kittens4.png)
 
 ### Additional resources.
 
