@@ -1,22 +1,23 @@
 # Bottery
-## A conversational agent prototyping platform by katecompton@
 
-(This is not an official Google product)
+## A conversational agent prototyping platform by [Kate Compton](https://github.com/galaxykate).
+
+(This is not an official Google product.)
 
 ## What is this?
 
-Bottery is a syntax, editor, and simulator for prototyping **generative contextual conversations** modeled as **finite state machines**
+Bottery is a syntax, editor, and simulator for prototyping **generative contextual conversations** modeled as **finite state machines**.
 
-Bottery takes inspiration from the **[Tracery](http://tracery.io/)** opensource project for generative text (also by katecompton@ in a non-google capacity) and the CheapBotsDoneQuick bot-hosting platform, as well as open FSM-based storytelling tools like Twine.  
+Bottery takes inspiration from the **[Tracery](http://tracery.io/)** open-source project for generative text (also by katecompton@ in a non-google capacity) and the [Cheap Bots, Done Quick!](https://cheapbotsdonequick.com/) bot-hosting platform, as well as open FSM-based storytelling tools like Twine.  
 
-Like Tracery, Bottery is a *syntax* that specifies the script of a conversation (a *map*) with JSON.  Like CheapBotsDoneQuick, the BotteryStudio can take that JSON and run a simulation of that conversation in a nice Javascript front-end, with helpful visualizations and editting ability.
+Like Tracery, Bottery is a *syntax* that specifies the script of a conversation (a *map*) with JSON.  Like Cheap Bots, Done Quick!, the BotteryStudio can take that JSON and run a simulation of that conversation in a nice Javascript front-end, with helpful visualizations and editing ability.
 
 The goal of Bottery is to help *everyone*, from designers to writers to coders, be able to write simple and engaging  contextual conversational agents, and to test them out in a realistic interactive simulation, mimicking how they'd work on a "real" platform like API.AI.  
 
 
 ## Bottery concepts
 
-Users in Tracery write **grammars**, JSON objects that recursively define how to generate some text, like [the musings of a lost self-driving car](http://cheapbotsdonequick.com/source/losttesla) or [outer-space adventures](http://cheapbotsdonequick.com/source/tinyadv).  Tracery grammars are lists of symbol names (like "animal") and their expansion rules (like "emu, okapi, pangolin").
+Users in Tracery write **grammars**, JSON objects that recursively define how to generate some text, like [the musings of a lost self-driving car](https://cheapbotsdonequick.com/source/losttesla) or [outer-space adventures](https://cheapbotsdonequick.com/source/tinyadv).  Tracery grammars are lists of symbol names (like "animal") and their expansion rules (like "emu, okapi, pangolin").
 
 In Bottery, users write **maps**. Each map is composed of four sub-components
 * A set of **states**, with information about what to do on entering them, and how to get from one to another
@@ -25,7 +26,7 @@ In Bottery, users write **maps**. Each map is composed of four sub-components
 
 ### Blackboard (and the pointer)
 
-You can imagine a Bottery map like a finite state machine or a [boardgame board](https://www.google.com/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&ved=0ahUKEwibnLuC-JDSAhVRyWMKHZQNB3cQjRwIBw&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2F361273201334614541%2F&psig=AFQjCNGOTBu2PiFkWuV4zs2eeF-mL0PP-Q&ust=1487208084344985): there are spaces, and connections between the spaces, and rules for how to move between them.  The map itself doesn't change or store information during play.  Instead, you have a **pointer** showing whch state you are on, all the variables in the blackboard (like the number of kids in your Game of Life car).
+You can imagine a Bottery map like a finite state machine or a [boardgame board](https://www.google.com/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&ved=0ahUKEwibnLuC-JDSAhVRyWMKHZQNB3cQjRwIBw&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2F361273201334614541%2F&psig=AFQjCNGOTBu2PiFkWuV4zs2eeF-mL0PP-Q&ust=1487208084344985): there are spaces, and connections between the spaces, and rules for how to move between them.  The map itself doesn't change or store information during play.  Instead, you have a **pointer** showing which state you are on, all the variables in the blackboard (like the number of kids in your Game of Life car).
 
 An RPG map might use the blackboard to store the number of hit points for the main character, their current weapon and its stats, their gold, and quest progress.  A quiz bot might store all of its categories, questions and answers, the players' current points, and which questions it wants to ask next.  You can store strings, booleans, numbers, hierarchical objects, and arrays in the blackboard.  Storing and retrieving information is done with a Javascript-like syntax: `foo.bar[5]` gets the value at the 5th index of object `bar` in object `foo`.  `foo.baz[10][20] = 10` behaves similarly, though unlike Javascript, if these parameters don't exist, it will create new objects or arrays and fill them rather than throwing an error. See `parseMapPath` in `map.js` for details.
 
@@ -63,7 +64,7 @@ The list of actions is in **action syntax** (see below).
 
 ### Condition
 
-Contitions fall under the following categories:
+Conditions fall under the following categories:
 * Inputs: User input matching a string. E.g., `"one"` or `"two"`. The presence of quotes indicates a string that must be matched by the last user input. An asterisk `*` matches *any* user input.
 * Expressions: Mathematical syntax representing equality, inequality, and so on. Most basic math expressions are valid e.g. `count>4`. Expressions can use variables that exist in the blackboard, using the blackboard variable syntax (see above). 
 * Values: There is only one type of these at present, `wait:[time in seconds to wait]`. This evaluates to true after that much time has elapsed after entering the current state.
@@ -122,7 +123,7 @@ This information is typically invisible to an end user interacting with the bot.
 
 Presents a view of the bot’s state machine. This shows all the states that the bot can traverse through, and within them indicates the commands that are executed by the bot, and the ways to traverse to the next state[s]. The initial state is always "origin". This view is not interactive, but is a visual representation of the underlying script.
 
-### Stateview
+### State view
 
 This is a representation of the current state of the bot, and the potential next states, as well as the conditions for enabling these particular transitions.
 
@@ -174,7 +175,7 @@ bot = {
 }
 ```
 
-This example introduces two new states: `name` and `respondToName`. These states are connected via `exits`. The exit on `origin` has no conditions, and therefore is entered immedately by the Pointer. The exit in the state `name` requies some form of user input indicated by the asterisk. This exit has an action associated with it in the form `name=INPUT`. `INPUT` is a special variable indicating the user's input. `name=INPUT` has the effect that the variable `name` is assigned to what the user entered, and is saved in the blackboard. In state `respondToName` there is an `onEnterSay` behavior, which is similar to `onEnter`, but does not require extra single quotes around the text outputted. The blackboard variable `name` is accessed via Tracery syntax using `#/name#`.
+This example introduces two new states: `name` and `respondToName`. These states are connected via `exits`. The exit on `origin` has no conditions, and therefore is entered immediately by the Pointer. The exit in the state `name` requires some form of user input indicated by the asterisk. This exit has an action associated with it in the form `name=INPUT`. `INPUT` is a special variable indicating the user's input. `name=INPUT` has the effect that the variable `name` is assigned to what the user entered, and is saved in the blackboard. In state `respondToName` there is an `onEnterSay` behavior, which is similar to `onEnter`, but does not require extra single quotes around the text outputted. The blackboard variable `name` is accessed via Tracery syntax using `#/name#`.
 
 Interacting with this bot, you can see that the **viz** view displays the state graph, and the blackboard view displays the user-entered name.
 
@@ -182,7 +183,7 @@ Interacting with this bot, you can see that the **viz** view displays the state 
 
 ### Suggestion chips
 
-User interactions can be expediated though the use of suggestion chips. These are prompts that are shown to the user when interacting through text. 
+User interactions can be expedited though the use of suggestion chips. These are prompts that are shown to the user when interacting through text. 
 
 ```javascript
 bot = {
