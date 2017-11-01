@@ -34,12 +34,19 @@ module.exports = function(grunt){
         '/css/**/*.css',
         '!/js/vendor/*',
       ]
+    },
+    open: {
+      dev: {
+        path: '<%= connect.options.protocol %>://<%= connect.options.hostname %>:<%= connect.options.port %>/'
+      }
     }
   });
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-open');
   grunt.registerTask('serve', [
     'connect:livereload',
+    'open:dev',
     'watch'
   ]);
 }
