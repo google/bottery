@@ -36,14 +36,11 @@ var bots = [
   "besties",
   "emotionFlow",
   "kittens",
-  "kittens1",
   "maraudersMap",
   "petSim",
   "quiz",
-  "quiz_m0",
   "rhymes",
   "tesla",
-  "testIf",
 ];
 
 for (var i = 0; i < bots.length; i++) {
