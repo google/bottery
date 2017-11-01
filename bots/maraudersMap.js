@@ -49,7 +49,7 @@ bot = {
       Hufflepuff: ["Cedric Diggory", "Zacharias Smith", "Justin Finch-Fletchley", "Hannah Abbott", "Susan Bones", "Ernie Macmillan"],
       Ravenclaw: ["Luna Lovegood", "Cho Chang", "Padma Patil", "Marietta Edgecobe", "Felicity Eastchurch"],
       Slytherin: ["Vincent Crabbe", "Draco Malfoy", "Millicent Bulstrode", "Pansy Parkinson", "Blaise Zabini", "Gregory Goyle"],
-      Griffindor: ["Percy Weasley", "Oliver Wood", "Fred Weasley", "George Weasley", "Lee Jordan", "Dean Thomas", "Harry Potter", "Ron Weasley", "Hermione Granger", "Lavender Brown", "Neville Longottom", "Parvati Patil", "Colin Creevey", "Ginny Weasley"]
+      Griffindor: ["Percy Weasley", "Oliver Wood", "Fred Weasley", "George Weasley", "Lee Jordan", "Dean Thomas", "Harry Potter", "Ron Weasley", "Hermione Granger", "Lavender Brown", "Neville Longbottom", "Parvati Patil", "Colin Creevey", "Ginny Weasley"]
 
 
     },
