@@ -19,7 +19,7 @@ function loadBot(name, map) {
   req = $.ajax("bots/" + name + ".js", {
     async: false,
     dataType: "script",
-  });
+  });  
   req.done(function(data) {
     console.log("Bot '" + name + "' loaded successfully");
     map[name] = eval(data);
