@@ -82,6 +82,7 @@ var chat = {
       });
 
     });
+    chat.bubbleHolder.scrollTop(chat.bubbleHolder[0].scrollHeight);
   },
 
   clearChips: function() {

@@ -51,7 +51,7 @@ color: rgba(0, 0, 0, .3);
   flex: 1;
   position: relative;
   z-index: 30;
-  overflow: scroll;
+  overflow: auto;
   height: 250px;
   background-color: hsl(20, 10%, 80%);
   
@@ -251,7 +251,7 @@ display: flex;
   flex: 1;
   z-index: 40;
   background-color:  hsla(20, 50%, 85%, .5);
-  overflow: scroll
+  overflow: auto; 
 }
 
 .blackboard-content.blackboard-content-value {

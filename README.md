@@ -12,7 +12,7 @@ Bottery takes inspiration from the **[Tracery](http://tracery.io/)** open-source
 
 Like Tracery, Bottery is a *syntax* that specifies the script of a conversation (a *map*) with JSON.  Like Cheap Bots, Done Quick!, the BotteryStudio can take that JSON and run a simulation of that conversation in a nice JavaScript front-end, with helpful visualizations and editing ability.
 
-The goal of Bottery is to help *everyone*, from designers to writers to coders, be able to write simple and engaging  contextual conversational agents, and to test them out in a realistic interactive simulation, mimicking how they'd work on a "real" platform like API.AI.  
+The goal of Bottery is to help *everyone*, from designers to writers to coders, be able to write simple and engaging  contextual conversational agents, and to test them out in a realistic interactive simulation, mimicking how they'd work on a "real" platform like DialogFlow.  
 
 
 ## Bottery concepts
