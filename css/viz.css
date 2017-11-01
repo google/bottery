@@ -347,7 +347,7 @@ background-color: hsla(290, 80%, 57%, .2);
   flex: 1;
   height: 240px;
   display: flex;
-  overflow: scroll;
+  overflow: auto;
   flex-direction: column;
 }
 

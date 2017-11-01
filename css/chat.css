@@ -24,7 +24,8 @@
 }
 
 .chat-bubbles {
-  overflow: scroll;
+  overflow-y: scroll;
+  overflow-x: auto;
   flex: 1;
   background-color: hsla(320, 50%, 100%, 1);
 }
