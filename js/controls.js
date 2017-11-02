@@ -115,7 +115,7 @@ var controls = {
     }).appendTo(div).click(function() {
 
       controls.changeVal(key, !app[key], onChange);
-
+      app.togglePause();
       if (app[key])
         button.addClass("toggle-on");
       else
