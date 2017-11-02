@@ -15,17 +15,23 @@
 // Load bots for demo
 
 function loadBot(name, map) {
-  console.log("loading " + name);
+  console.info("Loading bot '%s'", name);
   req = $.ajax("bots/" + name + ".js", {
     async: false,
     dataType: "script",
   });  
   req.done(function(data) {
-    console.log("Bot '" + name + "' loaded successfully");
+    console.info("Bot '%s' loaded successfully", name);
     map[name] = eval(data);
   });
-  req.fail(function( jqXHR, textStatus ) {
-    console.log("Bot '" + name + "' could not be loaded: " + textStatus );
+  req.fail(function(jqXHR,  textStatus, errorThrown) {
+    if (jqXHR.status !== 200) {
+      console.error("Bot '%s' could not be loaded: %d (%s)", name, jqXHR.status, jqXHR.statusText);
+    } else if (textStatus === 'parsererror') {
+      console.error("Bot '%s' could not be parsed: %s", name, errorThrown);
+    } else {
+      console.error("Bot '%s' could not be loaded: %s", name, errorThrown);
+    }
   });
 }
 
