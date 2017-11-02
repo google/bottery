@@ -29,10 +29,10 @@ module.exports = function(grunt){
         livereload: liveReloadPort
       },
       files: [
-        '/js/**/*.js',
-        '/bots/**/*.js',
-        '/css/**/*.css',
-        '!/js/vendor/*',
+        './js/**/*.js',
+        './bots/**/*.js',
+        './css/**/*.css',
+        '!./js/vendor/*',
       ]
     },
     open: {

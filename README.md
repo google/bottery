@@ -362,6 +362,11 @@ To run Bottery in your local machine you need to have node/npm installed on your
 ```
 $npm install
 $npm install -g grunt-cli
+
+```
+
+When installation is done, run:
+```
 $grunt serve
 ```
 The default port to host the app is set to 9000 and for livereload module is 35730, you can change it by passing parameters with `$grunt serve -port <port> -liveReloadPort <liveReloadPort>`
