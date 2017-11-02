@@ -24,9 +24,9 @@ var app = {
     app.paused = !app.paused;
     console.log(app.paused);
     if (app.paused)
-      $("#pause").html("unpause");
+      $(".toggle").html("unpause");
     else
-      $("#pause").html("pause");
+      $(".toggle").html("pause");
   },
 
   // Time
@@ -111,7 +111,7 @@ var app = {
         app.pointer.updateView();
         inspector.inspect(app.map);
     */
-  
+
 }
 
 };
