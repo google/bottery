@@ -26,7 +26,7 @@ function loadBot(name, map) {
   });
   req.fail(function(jqXHR,  textStatus, errorThrown) {
     if (jqXHR.status !== 200) {
-    console.error("Bot '%s' could not be loaded: %d (%s)", name, jqXHR.status, jqXHR.statusText);
+      console.error("Bot '%s' could not be loaded: %d (%s)", name, jqXHR.status, jqXHR.statusText);
     } else if (textStatus === 'parsererror') {
       console.error("Bot '%s' could not be parsed: %s", name, errorThrown);
     } else {
