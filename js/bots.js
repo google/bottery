@@ -24,8 +24,14 @@ function loadBot(name, map) {
     console.info("Bot '%s' loaded successfully", name);
     map[name] = eval(data);
   });
-  req.fail(function(jqXHR) {
+  req.fail(function(jqXHR, exception) {
+    if (jqXHR.status !== 200) {
     console.error("Bot '%s' could not be loaded: %d (%s)", name, jqXHR.status, jqXHR.statusText);
+    } else if (exception === 'parsererror') {
+      console.error("Bot '%s' could not be parsed. Check for syntax errors.", name);
+    } else {
+      console.error("Bot '%s' could not be loaded: %s", exception);
+    }
   });
 }
 
