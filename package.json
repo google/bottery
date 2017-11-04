@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/smishr4/bottery.git"
+    "url": "git+https://github.com/google/bottery.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/smishr4/bottery/issues"
+    "url": "https://github.com/google/bottery/issues"
   },
-  "homepage": "https://github.com/smishr4/bottery#readme",
+  "homepage": "https://github.com/google/bottery#readme",
   "devDependencies": {
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0"
