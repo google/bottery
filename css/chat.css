@@ -61,7 +61,7 @@
 
 .chat-chip:hover {
   background-color: hsla(190, 40%, 40%, 1);
-
+  cursor: default;
 }
 .chat-chip:active {
   background-color: hsla(190, 60%, 70%, 1);
