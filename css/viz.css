@@ -307,6 +307,10 @@ background-color: hsla(290, 80%, 57%, .2);
   cursor: default;
 }
 
+.openable-section.section:not(.open):hover {
+  background-color: hsla(220, 60%, 71%, 1);
+}
+
 .openable-section.open {
   background-color: hsla(320, 60%, 90%,1);
   height: auto;
