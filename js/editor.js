@@ -118,7 +118,6 @@ function createEditorUI() {
 
   controls.createDropdownControl("savedMap", savedNames, function(val) {
     // load from storage
-    console.log("val:", val);
     app.loadMapByID(val, true);
     //  app.loadMap(JSON.parse(localStorage.getItem(val)), val.substring(4));
   }, editBar)
