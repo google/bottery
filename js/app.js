@@ -61,12 +61,10 @@ var app = {
     $("#map-select").val(id);
 
     if (raw) {
-
       app.loadMap(raw, id);
       localStorage.setItem("lastMap", id);
     } else {
       console.error("Map '%s' not found", id);
-      app.loadMap(testMaps[id], id);
     }
   },
 
