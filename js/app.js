@@ -69,7 +69,7 @@ var app = {
   },
 
   loadMap: function(raw, id) {
-   console.log("LOAD " + id)
+   console.info("Starting '%s'", id)
     if (!raw.settings)
       raw.settings = {
         id: id
