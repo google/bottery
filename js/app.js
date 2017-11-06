@@ -46,7 +46,7 @@ var app = {
 
 
   loadMapByID: function(id, edited) {
-    console.log("Load map by id: " + id + " edited: " + edited);
+    console.info("Load map by id: '%s', edited: %s", id, edited);
     var raw = testMaps[id];
 
     if (edited) {
@@ -54,7 +54,7 @@ var app = {
 
       if (found !== null) {
         raw = JSON.parse(found);
-        console.log("successfully loaded edited" + id);
+        console.info("Successfully loaded edited '%s'", id);
       }
     }
 
@@ -71,7 +71,7 @@ var app = {
       app.loadMap(raw, id);
       localStorage.setItem("lastMap", id);
     } else {
-      console.log("Map" + inQuotes(id) + " not found");
+      console.error("Map '%s' not found", id);
       app.loadMap(testMaps[id], id);
     }
   },
