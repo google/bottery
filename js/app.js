@@ -58,12 +58,6 @@ var app = {
       }
     }
 
-    if (!raw) {
-      console.log(inQuotes(id) + " not found");
-      id = defaultMapID;
-      raw = testMaps[id];
-    }
-
     $("#map-select").val(id);
 
     if (raw) {
@@ -179,9 +173,12 @@ $(document).ready(function() {
     setTimeout(update, Math.pow(1 - app.updateSpeed, 2) * 450 + 100);
   }
 
-  var last = localStorage.getItem("lastMap");
+  var startUpMapId = localStorage.getItem("lastMap");
+  if (startUpMapId === null) {
+    startUpMapId = defaultMapID; 
+  }
 
-  app.loadMapByID(last, true);
+  app.loadMapByID(startUpMapId, true);
   update();
 });
 
