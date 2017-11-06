@@ -105,17 +105,19 @@ function createEditorUI() {
 
   // All savednames are prefixed with map_
   var savedNames = [];
-  for (var i = 0, len = localStorage.length; i < len; ++i) {
+  for (var i = 0; i < localStorage.length; ++i) {
     var key = localStorage.key(i);
     if (key.startsWith("map_"))
       savedNames.push(key.substring(4));
   }
 
-  console.log("Saved found: " + savedNames);
+  if (savedNames.length) {
+    const savedNamesString = savedNames.map(mapName => "'"+mapName+"'").join(', ')
+    console.info("Previously saved bots found: " + savedNamesString);
+  }
 
   controls.createDropdownControl("savedMap", savedNames, function(val) {
     // load from storage
-    console.log("val:", val);
     app.loadMapByID(val, true);
     //  app.loadMap(JSON.parse(localStorage.getItem(val)), val.substring(4));
   }, editBar)
