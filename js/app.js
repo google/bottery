@@ -111,11 +111,11 @@ var mapCount = 0;
 var updateSpeed = 20;
 
 $(document).ready(function() {
-  new Panel("viz", {
-    x: 1180,
+  new Panel("chat", {
+    x: 10,
     y: 10,
     w: 320,
-    h: 320,
+    h: 480,
   });
 
   new Panel("controls", {
@@ -124,26 +124,21 @@ $(document).ready(function() {
     w: 320,
     h: 250,
   });
-  new Panel("chat", {
-    x: 10,
-    y: 10,
-    w: 320,
-    h: 480,
-  });
 
-  //new Panel("viz");
-  new Panel("blackboard", {
-    x: 350,
-    y: 510,
-    w: 400,
-    h: 230
-  });
   new Panel("editor", {
     x: 350,
     y: 10,
     w: 400,
     h: 480,
   });
+
+  new Panel("blackboard", {
+    x: 350,
+    y: 510,
+    w: 400,
+    h: 230
+  });
+  
   new Panel("inspector", {
     x: 770,
     y: 10,
@@ -151,13 +146,20 @@ $(document).ready(function() {
     h: 650,
   });
 
+  new Panel("viz", {
+    x: 1180,
+    y: 10,
+    w: 320,
+    h: 320,
+  });
+  
   new Panel("stateview", {
     x: 1180,
     y: 350,
     w: 200,
     h: 200,
   });
-
+  
   io.init();
   chat.init();
   viz.init();
