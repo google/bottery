@@ -112,29 +112,29 @@ var updateSpeed = 20;
 
 $(document).ready(function() {
   new Panel("viz", {
-    x: 1200,
+    x: 1180,
     y: 10,
     w: 320,
     h: 320,
   });
 
   new Panel("controls", {
-    x: 0,
-    y: 520,
+    x: 10,
+    y: 510,
     w: 320,
-    h: 128,
+    h: 250,
   });
   new Panel("chat", {
     x: 10,
     y: 10,
-    w: 310,
+    w: 320,
     h: 480,
   });
 
   //new Panel("viz");
   new Panel("blackboard", {
     x: 350,
-    y: 420,
+    y: 510,
     w: 400,
     h: 230
   });
@@ -142,18 +142,18 @@ $(document).ready(function() {
     x: 350,
     y: 10,
     w: 400,
-    h: 400,
+    h: 480,
   });
   new Panel("inspector", {
-    x: 780,
+    x: 770,
     y: 10,
     w: 390,
     h: 650,
   });
 
   new Panel("stateview", {
-    x: 1200,
-    y: 340,
+    x: 1180,
+    y: 350,
     w: 200,
     h: 200,
   });
