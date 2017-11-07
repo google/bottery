@@ -146,26 +146,25 @@ var controls = {
       class: "slider-value",
     }).appendTo(header);
 
-    var bar = $("<div/>", {
+    var bar = $("<input>", {
       class: "slider-bar",
-    }).appendTo(holder);
-
-    bar.slider({
+      type: "range",
       min: min,
       max: max,
-      step: step,
-      slide: function(ev, ui) {
-        var val = ui.value;
-        value.html(val.toFixed(2));
-        app[key] = val;
-        controls.changeVal(key, val, onChange);
-      }
+      step: step
+    }).appendTo(holder);
+
+    bar.change(function(ev) {
+      var val = parseFloat(ev.target.value);
+      value.html(val.toFixed(2));
+      app[key] = val;
+      controls.changeVal(key, val, onChange);
     });
 
     var val = controls.getDefaultValue(key, .5);
     val = parseFloat(val);
     value.html(val.toFixed(2));
-    bar.slider('value', val);
+    bar.val(val);
     app[key] = val;
   },
 
