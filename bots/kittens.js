@@ -16,7 +16,7 @@ bot = {
       exits: "'*' ->respond_to_name name=INPUT",
     },
     respond_to_name: {
-      onEnterSay: "The kitten purrs happily, I guess it likes the name #/name#!",
+      onEnterSay: "The kitten purrs happily, I guess they like the name #/name#!",
       exits: "->idle"
     },
     pet: {
@@ -24,16 +24,16 @@ bot = {
       exits: ["desired_pets>=0 ->happy_pet", "->angry_pet"]
     },
     happy_pet: {
-      onEnterSay: "#/name# loves you and is in ecstacy",
+      onEnterSay: "#/name.capitalize# loves you and is in ecstacy",
       exits: "wait:10 ->idle"
     },
     angry_pet: {
-      onEnterSay: "why did you pet #/name# when it didn't want to be petted!?",
+      onEnterSay: "Why did you pet #/name# when they didn't want to be petted!?",
       onEnter: "desired_pets=randomInt(1,5)",
       exits: "->angry"
     },
     idle: {
-      onEnterSay: "#/name# rolls around and makes cute noises",
+      onEnterSay: "#/name.capitalize# rolls around and makes cute noises",
       exits: "wait:10 ->hungry",
     },
     angry: {
