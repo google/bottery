@@ -23,8 +23,7 @@ bot = {
     },
 
     driving: {
-      onEnterPlay: "cc/Syme 0#lowdigit#.wav",
-
+      // onEnterPlay: "'cc/Syme 0#lowdigit#.wav'",
       onEnterSay: "driving\n",
       exits: ["wait:4 ->update"]
     },
