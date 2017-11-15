@@ -37,7 +37,7 @@ var chat = {
 
     // Create the chat
     chat.chipRow = $("<div/>", {
-      class: "chat-inputrow"
+      class: "chat-inputrow chat-chiprow"
     }).appendTo(chat.chatHolder);
 
     // Create the chat
