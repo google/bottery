@@ -52,7 +52,8 @@ var chat = {
 
     // Create text field
     chat.inputField = $("<input/>", {
-      class: "chat-inputfield"
+      class: "chat-inputfield",
+      placeholder: "Message"
     }).appendTo(inputHolder).keyup(function(e) {
       if (e.keyCode === 13) {
         chat.say(1, $(this).val());
