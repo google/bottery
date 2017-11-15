@@ -1,17 +1,12 @@
 bot = {
   states: {
     origin: {
-      onEnterSay: "#To most people, the future is dark and murky, but maybe you’re different. Maybe the future to you is an unread book, just waiting to be pulled off the shelf. Will you flip through its pages? Will you read into the future? Will you discover your psychic potential?",
-      exits: ["_totalPlays>0 ->returningPlayer", "->firstTimePlayer"],
+      onEnterSay: "#intro#",
+      exits: ["->firstTimePlayer"],
     },
 
     firstTimePlayer: {
       onEnterSay: "#firstTimeInstructions#\n#firstTimePrompt#",
-      exits: "->predict"
-    },
-
-    returningPlayer: {
-      onEnterSay: "#returningInstructions#\n#returningPrompt#",
       exits: "->predict"
     },
 
@@ -21,48 +16,46 @@ bot = {
         "'heads' ->doFlip prediction='heads'", 
         "'tails' ->doFlip prediction='tails'", 
         "'*' ->askForClarification", 
-        "wait:10 ->whineAtPlayer"
+        "wait:30 ->whineAtPlayer"
       ],
     },
 
     whineAtPlayer: {
-      onEnterSay: "use your psychic powers and FOCUS!",
+      onEnterSay: "#whine#",
       exits: ["->predict"],
     },
 
     askForClarification: {
-      onEnterSay: ["#askForClarification#"],
+      onEnterSay: "#askForClarification#",
       exits: ["->predict"]
     },
 
     doFlip: {
-      onEnter: ["'#flipping#'", "value=random()"],
-      exits: ["value<.5 ->result_heads", "->result_tails"],
+      onEnter: "'#flipping#' value=random()",
+      exits: ["value<.5 ->result_heads", "(value>=0.5)&&(value<(0.5+edgeChance)) ->result_edge", "->result_tails"],
     },
 
     result_heads: {
-      onEnter: "playSound(coinflip_heads.wav) result='heads' '#itsHeads#'",
+      // onEnterPlay: "'coinflip_heads.wav'",
+      onEnter: "result='heads' '#itsHeads#'",
       exits: ["->tally"],
     },
 
     result_tails: {
-      onEnter: "playSound(coinflip_tails.wav) result='tails' '#itsTails#'",
+      // onEnterPlay: "'coinflip_tails.wav'",
+      onEnter: "result='tails' '#itsTails#'",
       exits: ["->tally"],
     },
 
     result_edge: {
-      onEnter: "playSound(coinflip_edge.wav) result='edge' '#itsEdge#'",
+      // onEnterPlay: "'coinflip_edge.wav'",
+      onEnter: "result='edge' '#itsEdge#'",
       exits: ["->tally"],
     },
 
     tally: {
       exits: ["prediction==result ->right ", "->wrong"],
     },
-
-    // On ending a losing streak
-    // On ending a winning streak
-    // On achieving a new winning streak
-    // On achieving a new losing streak
 
     right: {
       onEnter: "'#youWereRight#' winStreak++ lastLoseStreak=loseStreak loseStreak=0 rightGuesses++ pattern+='C' accuracy=rightGuesses/(wrongGuesses + rightGuesses) if(winStreak>maxWinStreak, '#newWinBestScore#')",
@@ -89,9 +82,6 @@ bot = {
 
       exits: ["->predict"]
     },
-
-
-
   },
 
   initialBlackboard: {
@@ -105,7 +95,9 @@ bot = {
     edgeChance: .001,
     streak0: 2,
     streak1: 4,
-    streak2: 6
+    streak2: 6,
+    lastLoseStreak: 0,
+    lastWinStreak: 0
   },
 
   grammar: {
@@ -116,13 +108,16 @@ bot = {
     winningStreak2: "That's amazing, you're so good!",
     winningStreak1: "You've really got a winning streak going!",
     winningStreak0: "Very promising",
+    genericWin: "Nice, go again?",
     losingStreak2: "That's amazing, you're terrible at this!",
     losingStreak1: "Wow, you might be reverse psychic.",
     losingStreak0: "Not looking good for your psychic ability",
-    lostLosingStreak: "What a comeback from #/lastLossStreak# losses!",
-    lostWinningStreak: "Oh no, you lost your #/lastWinStreak#",
+    genericLose: "Aww, Go again?",
+    lostLosingStreak: "What a comeback from #/lastLoseStreak# losses!",
+    lostWinningStreak: "Oh no, you lost your #/lastWinStreak# wins!",
 
-
+    youWereRight: "You were right!",
+    youWereWrong: "You were wrong 🙁",
 
     debugData: "(debug info: loseStreak:#/loseStreak# winStreak:#/winStreak# chain:#/pattern# accuracy:#/accuracy#)",
 
@@ -132,6 +127,7 @@ bot = {
 
     flipping: "I'm flipping the coin...",
 
+    intro: "To most people, the future is dark and murky, but maybe you’re different. Maybe the future to you is an unread book, just waiting to be pulled off the shelf. Will you flip through its pages? Will you read into the future? Will you discover your psychic potential?",
     returningInstructions: ["I’ll flip a coin, and you try to predict the results.", "You know the drill: I'll flip a coin. You predict what it'll be.", "Welcome back! All our testing equipment is still set up. Just make a prediction, and I'll flip a coin."],
     firstTimeInstructions: ["I’m going to flip a coin. You tell me what you think it’ll land on. We’ll keep a running tally and see how many you get right."],
     returningPrompt: ["Here we go again: heads or tails?",
@@ -151,9 +147,14 @@ bot = {
       "Clear your mind and focus: heads or tails?"
     ],
 
+    whine: "Use your psychic powers and FOCUS!",
+
     c: ["It’s #/result#! {Correct SFX} It’s too early to say for sure, but your psychic abilities are showing quite a bit of potential. Let’s try again.", "You got it right!", "Go team! That means you."],
     x: ["Oh, it was #/result#. {Incorrect SFX} Even world-class psychics take some time to get warmed up. Let’s keep going. Take a deep breath, let your mental energy flow, and try again."],
 
-    askForClarification: [],
+    askForClarification: ["Sorry, you need to choose either 'heads' or 'tails'.",
+      "'heads' or 'tails' please.",
+      "The inputs I understand are 'heads' or 'tails'.",
+    ],
   }
 };
