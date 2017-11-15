@@ -35,22 +35,22 @@ var chat = {
       class: "chat-bubbles"
     }).appendTo(chat.chatHolder);
 
-    // Create the chat
+    // Create the suggestion chips row
     chat.chipRow = $("<div/>", {
       class: "chat-inputrow chat-chiprow"
     }).appendTo(chat.chatHolder);
 
-    // Create the chat
+    // Create the chat input row
     chat.inputRow = $("<div/>", {
       class: "chat-inputrow"
-
     }).appendTo(chat.chatHolder);
 
-    // text field
+    // Create container for text input and submission button
     var inputHolder = $("<div/>", {
       class: "chat-inputholder"
     }).appendTo(chat.inputRow);
 
+    // Create text field
     chat.inputField = $("<input/>", {
       class: "chat-inputfield"
     }).appendTo(inputHolder).keyup(function(e) {
