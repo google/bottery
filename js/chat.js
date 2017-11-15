@@ -35,37 +35,40 @@ var chat = {
       class: "chat-bubbles"
     }).appendTo(chat.chatHolder);
 
-    // Create the chat
-    chat.dataRow = $("<div/>", {
-      class: "chat-datarow"
-
-    }).appendTo(chat.chatHolder);
-
-    // Create the chat
+    // Create the suggestion chips row
     chat.chipRow = $("<div/>", {
-      class: "chat-inputrow"
-
+      class: "chat-inputrow chat-chiprow"
     }).appendTo(chat.chatHolder);
 
-    // Create the chat
+    // Create the chat input row
     chat.inputRow = $("<div/>", {
       class: "chat-inputrow"
-
     }).appendTo(chat.chatHolder);
 
-    // text field
+    // Create container for text input and submission button
     var inputHolder = $("<div/>", {
       class: "chat-inputholder"
     }).appendTo(chat.inputRow);
 
+    // Create text field
     chat.inputField = $("<input/>", {
-      class: "chat-inputfield"
-
+      class: "chat-inputfield",
+      placeholder: "Message"
     }).appendTo(inputHolder).keyup(function(e) {
       if (e.keyCode === 13) {
         chat.say(1, $(this).val());
         $(this).val("");
       }
+    });
+
+    // Submission button
+    chat.sayButton = $('<input/>', {
+      class: "chat-inputbutton",
+      type: "button",
+      value: "Say",
+    }).appendTo(inputHolder).click(function(e) {
+      chat.say(1, chat.inputField.val());
+      chat.inputField.val("");
     });
   },
 
