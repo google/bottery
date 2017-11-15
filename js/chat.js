@@ -59,6 +59,16 @@ var chat = {
         $(this).val("");
       }
     });
+
+    // Submission button
+    chat.sayButton = $('<input/>', {
+      class: "chat-inputbutton",
+      type: "button",
+      value: "Say",
+    }).appendTo(inputHolder).click(function(e) {
+      chat.say(1, chat.inputField.val());
+      chat.inputField.val("");
+    });
   },
 
   setChips: function(chips) {
