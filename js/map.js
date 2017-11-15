@@ -335,7 +335,7 @@ function parseMapAction(raw) {
         parsed.expression = parseMapExpression(sections[2]);
       } else {
 
-        if (!(parsed.operator === "++" || parsed.operator === "++")) {
+        if (!(parsed.operator === "++" || parsed.operator === "--")) {
           console.warn(inQuotes(raw) + " is missing a right-hand expression for this assignment operation");
         }
       }
