@@ -53,7 +53,6 @@ var chat = {
 
     chat.inputField = $("<input/>", {
       class: "chat-inputfield"
-
     }).appendTo(inputHolder).keyup(function(e) {
       if (e.keyCode === 13) {
         chat.say(1, $(this).val());
