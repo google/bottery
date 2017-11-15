@@ -84,13 +84,20 @@
   border-bottom-left-radius:0px;
 }
 
-.chat-inputfield {
-  padding: 5px;
-  
-}
 .chat-inputrow {
-  
-
   padding: 5px;
   background-color: hsla(240, 50%, 80%, 1);
+}
+
+.chat-inputholder {
+  display: flex;
+}
+
+.chat-inputfield {
+  flex-grow: 1;
+  padding: 5px;
+}
+
+.chat-inputbutton {
+  flex-grow: 0;
 }
