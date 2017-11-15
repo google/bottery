@@ -38,13 +38,11 @@ var chat = {
     // Create the chat
     chat.dataRow = $("<div/>", {
       class: "chat-datarow"
-
     }).appendTo(chat.chatHolder);
 
     // Create the chat
     chat.chipRow = $("<div/>", {
       class: "chat-inputrow"
-
     }).appendTo(chat.chatHolder);
 
     // Create the chat
