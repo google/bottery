@@ -169,11 +169,8 @@ var viz = {
             'color': 'rgb(255, 255, 255)',
             'background-color': '#666',
             'text-valign': 'center',
-            'shape': "roundrectangle",
             'label': 'data(label)',
-
             'shape': "ellipse",
-
             'width': 20,
             'height': 20
           }
