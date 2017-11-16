@@ -258,8 +258,6 @@ function createBasicFunctions() {
         amt += s.charCodeAt(i);
       }
       return amt % 100;
-
-      return 0;
     },
 
     play: function(filename) {

@@ -43,11 +43,7 @@ var io = {
   saveData: function(map, key, val) {
     localStorage.setItem("data-" + map.settings.id + "-" + key, val);
   },
-
-  loadMap: function(id) {
-
-  },
-
+  
 
   textToSpeech: function(text, onFinish, onFinishEach) {
 

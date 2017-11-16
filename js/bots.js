@@ -16,7 +16,7 @@
 
 function loadBot(name, map) {
   console.info("Loading bot '%s'", name);
-  req = $.ajax("bots/" + name + ".js", {
+  var req = $.ajax("bots/" + name + ".js", {
     async: false,
     dataType: "script",
   });  
