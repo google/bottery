@@ -164,7 +164,14 @@ $(document).ready(function() {
   chat.init();
   viz.init();
 
-  controls.init();
+  // Get the startUpMapId before we load the controls so we can assign the 
+  // dropdown properly
+  var startUpMapId = localStorage.getItem("lastMap");
+  if (startUpMapId === null) {
+    startUpMapId = defaultMapID; 
+  }
+
+  controls.init(startUpMapId);
 
   function update() {
     if (!app.paused && !app.ioLocked) {
@@ -173,10 +180,7 @@ $(document).ready(function() {
     setTimeout(update, Math.pow(1 - app.updateSpeed, 2) * 450 + 100);
   }
 
-  var startUpMapId = localStorage.getItem("lastMap");
-  if (startUpMapId === null) {
-    startUpMapId = defaultMapID; 
-  }
+
 
   app.loadMapByID(startUpMapId, true);
   update();

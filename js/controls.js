@@ -23,7 +23,7 @@ function clearDataWithPrefix(prefix) {
 
 
 var controls = {
-  init: function() {
+  init: function(defaultMap) {
     //console.log("Init controls");
     createEditorUI();
 
@@ -39,7 +39,7 @@ var controls = {
     this.createDropdownControl("mapName", Object.keys(testMaps), function(mapName) {
       console.log("load map " + mapName);
       app.loadMapByID(mapName, false);
-    });
+    }, this.holder, Object.keys(testMaps).indexOf(defaultMap));
 
     var div = $("<div/>").appendTo(this.holder);
     this.createSliderControl("updateSpeed", 0, 1, .05, div);
@@ -185,7 +185,7 @@ var controls = {
   },
 
 
-  createDropdownControl: function(key, options, onChange, holder) {
+  createDropdownControl: function(key, options, onChange, holder, defaultOptionIndex) {
     // Check for value
 
     if (holder === undefined)
@@ -204,7 +204,7 @@ var controls = {
         onChange(val);
     })
 
-    var val = controls.getDefaultValue(key, options[0]);
+    var val = controls.getDefaultValue(key, options[defaultOptionIndex]);
     app[key] = val;
     select.val(val);
   },
