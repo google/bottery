@@ -66,7 +66,7 @@ The list of actions is in **action syntax** (see below).
 
 Conditions fall under the following categories:
 * Inputs: User input matching a string. E.g., `"one"` or `"two"`. The presence of quotes indicates a string that must be matched by the last user input. An asterisk `*` matches *any* user input.
-* Expressions: Mathematical syntax representing equality, inequality, and so on. Most basic math expressions are valid e.g. `count>4`. Expressions can use variables that exist in the blackboard, using the blackboard variable syntax (see above). 
+* Expressions: Mathematical syntax representing equality, inequality, and so on. Most basic math expressions are valid e.g. `count>4`. Expressions can use variables that exist in the blackboard, using the blackboard variable syntax (see above).
 * Values: There is only one type of these at present, `wait:[time in seconds to wait]`. This evaluates to true after that much time has elapsed after entering the current state.
 
 ### Actions
@@ -183,7 +183,7 @@ Interacting with this bot, you can see that the **viz** view displays the state 
 
 ### Suggestion chips
 
-User interactions can be expedited though the use of suggestion chips. These are prompts that are shown to the user when interacting through text. 
+User interactions can be expedited though the use of suggestion chips. These are prompts that are shown to the user when interacting through text.
 
 ```javascript
 bot = {
@@ -277,7 +277,7 @@ bot = {
 }
 ```
 
-This example adds a global exit. No matter where the Pointer is at on the graph, the user can always pet the kitten. This introduces a problem, though, because the user could potentially pet the kitten before it was named, so an initial value for the name is configured in the blackboard. When the origin is entered, the variable `desired_pets` is set to a random value between 1 and 5. When the user pets the kitten too much, the `angry_pet` node is entered. 
+This example adds a global exit. No matter where the Pointer is at on the graph, the user can always pet the kitten. This introduces a problem, though, because the user could potentially pet the kitten before it was named, so an initial value for the name is configured in the blackboard. When the origin is entered, the variable `desired_pets` is set to a random value between 1 and 5. When the user pets the kitten too much, the `angry_pet` node is entered.
 
 ![](doc_images/kittens3.png?raw=true)
 
@@ -344,7 +344,7 @@ bot = {
 }
 ```
 
-This final example adds state transitions that form a cycle of activity. If no interaction occurs, the kitten will naturally cycle between the states of `hungry`, `sleeping`, and `angry`. The `wait:10` condition on the exit will delay for a particular amount of time before automatically advancing into that state. 
+This final example adds state transitions that form a cycle of activity. If no interaction occurs, the kitten will naturally cycle between the states of `hungry`, `sleeping`, and `angry`. The `wait:10` condition on the exit will delay for a particular amount of time before automatically advancing into that state.
 
 ![](doc_images/kittens4.png?raw=true)
 
@@ -355,3 +355,18 @@ This concludes the tutorial. For more examples of types of bots, check out:
 * `quiz.js` A basic quiz game where the user answers questions and these are used to determine a Hip Hop DJ name.
 * `tesla.js` A bot based on the tracery [twitter bot](https://twitter.com/losttesla) of the same name.
 
+### Install and Run Bottery
+
+To run Bottery in your local machine you need to have node/npm installed on your system, if you haven't then visit https://nodejs.org/en/ and follow the installation guide. Once its done then browse into the project directory and run:
+
+```
+$npm install
+$npm install -g grunt-cli
+
+```
+
+When installation is done, run:
+```
+$grunt serve
+```
+The default port to host the app is set to 9000 and for livereload module is 35730, you can change it by passing parameters with `$grunt serve -port <port> -liveReloadPort <liveReloadPort>`
